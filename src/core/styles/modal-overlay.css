@@ -1,0 +1,38 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1999;
+}
+
+.modal-overlay._active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-wrapper {
+    position: relative;
+    max-width: 90%;
+    max-height: 90%;
+}
+
+.tasks-modal__wrapper {
+    width: calc(100vw - 50px);
+    padding: 24px 36px;
+    max-width: 1045px;
+    border-radius: 16px;
+    background: #fff;
+    overflow: auto;
+    max-height: calc(100vh - 50px);
+    position: relative;
+}
+
+._modal-locked {
+    overflow: hidden;
+}

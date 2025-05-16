@@ -1,0 +1,156 @@
+
+.swipe-container {
+    display: flex;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    position: relative;
+}
+
+.swipe-container::-webkit-scrollbar {
+    display: none;
+}
+
+.swipe-container .swiper-wrapper {
+    display: flex;
+    transition: transform 0.3s ease;
+    min-width: 100%;
+}
+
+.swipe-container .swiper-slide {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    user-select: none;
+}
+
+/* Предотвращение выделения текста */
+.swipe-container .swiper-slide,
+.swipe-container .swiper-slide * {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+/* Класс для активного свайпа */
+.swipe-container.active {
+    cursor: grabbing !important;
+}
+
+/* Предотвращение выделения текста при активном свайпе */
+.swipe-container.active,
+.swipe-container.active *,
+.swipe-container.active *::selection {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    cursor: grabbing !important;
+}
+
+/* Для категорий */
+.categories-swipe-container {
+    background: #FCFCFC;
+    border-radius: 10px;
+    padding: 8px;
+}
+
+.categories-swipe-container .swiper-slide {
+    width: auto;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 4px;
+}
+
+.categories-swipe-container .shop__link {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    pointer-events: auto; /* Разрешаем клики, но не выделение */
+    cursor: pointer;
+}
+
+/* Для колонок задач */
+.tasks-swipe-container {
+    padding-bottom: 16px; /* Добавляем отступ снизу для лучшего отображения */
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding:  10px 0px;
+}
+
+.tasks-swipe-container .swiper-slide {
+    width: 280px;
+    padding-right: 8px;
+}
+
+/* Стили для адаптива */
+@media (max-width: 991px) {
+    .tasks-swipe-container .swiper-slide {
+        width: 90%;
+        max-width: 320px;
+    }
+}
+
+@media (max-width: 768px) {
+    .tasks-swipe-container .swiper-slide {
+        width: 85vw;
+        max-width: none;
+    }
+
+    .categories-swipe-container .swiper-slide {
+        margin-right: 2px;
+    }
+}
+
+/* Стили для темной темы */
+body.dark .categories-swipe-container {
+    background: #1A1D1F;
+}
+
+body.dark .shop__nav .shop__link.active {
+    color: #fff;
+}
+
+body.dark .shop__nav .shop__link {
+    background: none;
+}
+
+body.dark .shop-links__wrap {
+}
+
+/* Анимации для свайпа */
+@keyframes bounce {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(-5px); }
+}
+
+.swipe-container .swiper-slide:first-child {
+    position: relative;
+}
+
+.swipe-container .swiper-slide:first-child::after {
+    content: '';
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.swipe-container:hover .swiper-slide:first-child::after {
+    opacity: 1;
+    animation: bounce 1.5s infinite;
+}
+
+body.dark .swipe-container .swiper-slide:first-child::after {
+    background: rgba(255, 255, 255, 0.2);
+}

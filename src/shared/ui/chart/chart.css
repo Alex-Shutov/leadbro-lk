@@ -1,0 +1,49 @@
+.chart-skeleton {
+    width: 100%;
+    height: 100%;
+    background: #f0f0f0;
+    background-image: linear-gradient(
+            to right,
+            #f0f0f0 0%,
+            #e0e0e0 20%,
+            #f0f0f0 40%,
+            #f0f0f0 100%
+    );
+    background-repeat: no-repeat;
+    background-size: 800px 100%;
+    border-radius: 8px;
+    animation: shimmer 1.5s linear infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -468px 0;
+    }
+    100% {
+        background-position: 468px 0;
+    }
+}
+
+.chart-container {
+    overflow: hidden;
+}
+
+/* Для мобильных устройств */
+@media (max-width: 768px) {
+    .chart-container {
+        height: 250px !important;
+        min-height: 250px !important;
+    }
+
+    #apexcharts-canvas {
+        transform: scale(0.9);
+        transform-origin: left top;
+        width: 110% !important;
+    }
+}
+
+/* Стили для скелетона */
+.react-loading-skeleton {
+    line-height: 1;
+    display: block;
+}
