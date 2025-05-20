@@ -30,7 +30,6 @@ export const RegionSelector = ({
 
   return (
       <div className="selector-container">
-        <span className="selector-label">Регион:</span>
         <Select
             options={options}
             value={selectedValue}

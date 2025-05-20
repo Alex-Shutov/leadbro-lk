@@ -31,7 +31,6 @@ export const SearchEngineSelector = ({
 
   return (
       <div className="selector-container">
-        <span className="selector-label">Поисковая система:</span>
         <Select
             options={options}
             value={selectedValue}

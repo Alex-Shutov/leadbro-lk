@@ -9,7 +9,6 @@ export const PeriodSelector = ({
                                  dateRange,
                                  onDateRangeChange,
                                }) => {
-  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const calendarRef = useRef(null);
 
   // Parse date strings to Date objects
@@ -47,19 +46,7 @@ export const PeriodSelector = ({
     setEndDate(today);
   };
 
-  // Close calendar when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (calendarRef.current && !calendarRef.current.contains(event.target)) {
-        setIsCalendarOpen(false);
-      }
-    };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [calendarRef]);
 
   return (
       <div className="shop__control">
@@ -101,20 +88,9 @@ export const PeriodSelector = ({
             </a>
           </div>
 
-          <div
-              className={`calendar__head js-calendar-head ${
-                  isCalendarOpen ? "active" : ""
-              }`}
-              onClick={() => setIsCalendarOpen(true)}
-          >
-            <Icon name={"calendar"} size={24} />
-            <span className="calendar__details">
-            {formatDisplayDate(startDate)} - {formatDisplayDate(endDate || startDate)}
-          </span>
-          </div>
 
-          {isCalendarOpen && (
-              <div ref={calendarRef}>
+
+          {(
                 <CustomDatePicker
                     startDate={startDate}
                     endDate={endDate}
@@ -128,11 +104,9 @@ export const PeriodSelector = ({
                         start: dates.start,
                         end: dates.end,
                       });
-                      setIsCalendarOpen(false);
                     }}
                     onReset={resetDates}
                 />
-              </div>
           )}
         </div>
       </div>

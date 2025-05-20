@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { registerLocale } from "react-datepicker";
 import ru from "date-fns/locale/ru";
 import './CustomDatePicker.css'
+import {Icon} from "../../../shared/ui/icon";
 registerLocale("ru", ru);
 
 export const CustomDatePicker = ({
@@ -12,11 +13,15 @@ export const CustomDatePicker = ({
                                      onDateChange,
                                      onApply,
                                      onReset,
+                                    onClose
                                  }) => {
+    console.log(startDate, endDate, 'endDate');
     const [localStartDate, setLocalStartDate] = useState(startDate);
     const [localEndDate, setLocalEndDate] = useState(endDate);
     const [hoverDate, setHoverDate] = useState(null);
     const [currentMonth, setCurrentMonth] = useState(startDate || new Date());
+    const calendarRef = useRef(null);
+    const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
     const handleDateChange = (date) => {
         if (!date) return;
@@ -54,6 +59,7 @@ export const CustomDatePicker = ({
             start: formatDate(localStartDate),
             end: formatDate(localEndDate || localStartDate),
         });
+        setIsCalendarOpen(false);
     };
 
     // Функция для точного сравнения дат
@@ -158,7 +164,41 @@ export const CustomDatePicker = ({
         return classes.join(" ");
     };
 
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (calendarRef.current && !calendarRef.current.contains(event.target)) {
+                setIsCalendarOpen((prev)=>!prev)
+               onClose && onClose()
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [calendarRef]);
+
+    const formatDisplayDate = (date) => {
+        if (!date) return "";
+        return `${String(date.getDate()).padStart(2, "0")}-${String(
+            date.getMonth() + 1
+        ).padStart(2, "0")}-${date.getFullYear()}`;
+    };
+
     return (
+        <>
+            <div
+                className={`calendar__head js-calendar-head ${
+                    isCalendarOpen ? "active" : ""
+                }`}
+                onClick={() => setIsCalendarOpen(true)}
+            >
+                <Icon name={"calendar"} size={24} />
+                <span className="calendar__details">
+            {formatDisplayDate(startDate)} - {formatDisplayDate(endDate || startDate)}
+          </span>
+            </div>
+            { isCalendarOpen && <div ref={calendarRef}>
         <div className="calendar-popup">
             <div className="calendar-header">
                 <button
@@ -219,5 +259,7 @@ export const CustomDatePicker = ({
                 </button>
             </div>
         </div>
+        </div>}
+        </>
     );
 };

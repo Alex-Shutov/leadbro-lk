@@ -129,6 +129,10 @@ header:after, .container:after, footer:after, .widget-posts-list li:after, #subs
     color: white;
 }
 
+.requests .shop__control{
+    padding: 0 25px
+}
+
 .react-datepicker__day--keyboard-selected {
     background-color: rgba(42, 133, 255, 0.1);
     color: #2A85FF;

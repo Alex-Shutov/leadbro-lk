@@ -132,7 +132,7 @@ export const Chart = ({
           },
         },
         legend: {
-          show: true,
+          show: false,
           position: 'top',
           horizontalAlign: 'left',
           offsetY: 0,

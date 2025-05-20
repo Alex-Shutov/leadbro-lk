@@ -271,7 +271,7 @@ export const statisticsApi = {
 
       // Получаем ID проекта
       const finalProjectId = projectId || process.env.REACT_APP_TOPVISOR_PROJECT_ID || "7292013";
-
+      debugger
       // Используем API форматированные даты если они есть, иначе используем дефолтные
       const fromDate = dateRange.apiStart || formatDateForYandex(dateRange.start);
       const toDate = dateRange.apiEnd || formatDateForYandex(dateRange.end);
@@ -279,7 +279,7 @@ export const statisticsApi = {
       console.log(`Fetching positions for searcher: ${searcherKey}, region: ${regionKey}, from: ${fromDate}, to: ${toDate}`);
 
       // Получаем данные о позициях
-      const positionsResponse = await apiClient2.post(`/api/cabinet/topvisor/positions/summary`, {
+      const positionsResponse = await apiClient2.post(`/api/cabinet/topvisor/summary`, {
         project_id: finalProjectId,
         search_engines: [searcherKey],
         regions: [regionKey],

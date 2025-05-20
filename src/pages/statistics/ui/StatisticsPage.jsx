@@ -14,8 +14,11 @@ import {useEffectOnce} from "../../../core/hooks/useEffectOnce";
 export const StatisticsPage = () => {
   const {
     period,
+
     setPeriod,
     dateRange,
+    positionsDateRange,
+    setPositionsDateRange,
     setDateRange,
     graphType,
     setGraphType,
@@ -149,6 +152,9 @@ export const StatisticsPage = () => {
             onSearcherChange={setSelectedSearcher}
             onRegionChange={setSelectedRegion}
             projectDataLoading={projectDataLoading}
+            dateRange={positionsDateRange} // Используем отдельный dateRange
+            onDateRangeChange={setPositionsDateRange} // И его метод обновления
+            fetchPositions={fetchPositions}
         />
 
         <KeywordsPositions

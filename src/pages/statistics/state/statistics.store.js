@@ -35,6 +35,11 @@ export const useStatisticsStore = create((set, get) => ({
       dateRange: { start, end },
     });
   },
+  setPositionsDateRange: (positionsDateRange) => set({ positionsDateRange }),
+  positionsDateRange: {
+    start: getMonthAgoFormatted(),
+    end: getCurrentDateFormatted(),
+  },
   dateRange: {
     start: getWeekAgoFormatted(),
     end: getCurrentDateFormatted(),
@@ -105,7 +110,7 @@ export const useStatisticsStore = create((set, get) => ({
   setSelectedRegion: (region) => {
     set({ selectedRegion: region });
 
-    // После смены региона загружаем новые данные позиций
+    // После смены региона загружаем новые данные позицийo
     if (region) {
       const { fetchPositions } = get();
       fetchPositions();
@@ -271,26 +276,11 @@ export const useStatisticsStore = create((set, get) => ({
 
     } catch (error) {
       console.error("Failed to fetch goals:", error);
-
-      // Set default error state
-      // set({
-      //   goals: {
-      //     data: {
-      //       value: 0,
-      //       change: 0,
-      //       comparedTo: dateRange.start,
-      //       series: [{ name: selectedConversion || "Нет данных", data: [] }],
-      //       categories: [],
-      //       conversions: availableGoals.map(g => g.name)
-      //     }
-      //   },
-      //   goalsLoading: false
-      // });
     }
   },
 
   fetchPositions: async () => {
-    const { period, dateRange, selectedSearcher, selectedRegion, projectId } = get();
+    const { period, positionsDateRange, selectedSearcher, selectedRegion, projectId } = get();
 
     // Проверяем наличие необходимых данных
     if (!selectedSearcher || !selectedRegion || !projectId) {
@@ -318,7 +308,7 @@ export const useStatisticsStore = create((set, get) => ({
       // Вызываем API с необходимыми параметрами
       const response = await statisticsApi.fetchPositions(
           period,
-          dateRange,
+          positionsDateRange,
           searcherKey,
           regionKey,
           projectId  // Используем ID проекта или значение по умолчанию
