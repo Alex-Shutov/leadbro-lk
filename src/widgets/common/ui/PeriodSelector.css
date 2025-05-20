@@ -1,0 +1,163 @@
+/* Period selector styles */
+.shop__nav-links {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.shop-links__wrap {
+    display: flex;
+    border-radius: 12px;
+    padding: 4px;
+}
+
+.shop__link {
+    color: #6F767E;
+    padding: 8px 16px;
+    text-decoration: none;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.shop__link.active {
+    background-color: #33383F;
+    color: #fff;
+}
+
+/* Date selector container */
+.date-selector-container {
+    display: flex;
+    align-items: center;
+    border-radius: 12px;
+    padding: 8px 16px;
+    margin-left: 16px;
+    cursor: pointer;
+}
+
+.calendar-icon {
+    margin-right: 8px;
+    color: #33383F;
+}
+
+.date-display {
+    font-size: 14px;
+    font-weight: 500;
+    color: #33383F;
+}
+
+/* Calendar popup */
+.calendar-popup {
+    left: calc(100% - 320px);
+    position: absolute;
+    top: calc(100% + 8px);
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    z-index: 1000;
+    width: 320px;
+}
+
+/* Calendar header */
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.prev-month, .next-month {
+    background: none;
+    border: none;
+    color: #6F767E;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px 8px;
+}
+
+.current-month {
+    font-size: 18px;
+    font-weight: 600;
+    color: #33383F;
+    text-transform: capitalize;
+}
+
+/* Calendar styles */
+
+
+/* Custom day styling */
+.custom-day {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+}
+
+.selected-day {
+    background-color: #FF6A55 !important;
+    color: white !important;
+    border-radius: 50% !important;
+}
+
+/* Calendar footer */
+.calendar-footer {
+    display: flex;
+    margin-top: 16px;
+}
+
+.reset-button, .apply-button {
+    flex: 1;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+}
+
+.reset-button {
+    background-color: #F4F4F4;
+    color: #33383F;
+}
+
+.apply-button {
+    background-color: #FF6A55;
+    color: white;
+}
+
+/* Dark mode support */
+.dark .shop-links__wrap {
+}
+
+.dark .shop__link {
+    color: #9A9FA5;
+}
+
+.dark .shop__link.active {
+    background-color: #272B30;
+    color: #FCFCFC;
+}
+
+.dark .date-selector-container {
+}
+
+.dark .date-display {
+    color: #FCFCFC;
+}
+
+.dark .calendar-popup {
+    background: #1A1D1F;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.dark .current-month {
+    color: #FCFCFC;
+}
+
+
+
+.dark .reset-button {
+    background-color: #272B30;
+    color: #FCFCFC;
+}

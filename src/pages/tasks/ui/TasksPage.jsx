@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
 import { Layout } from "../../../shared/ui/layout";
 import { TasksBoard } from "./TasksBoard";
 import { TaskModal } from "./TaskModal";
 import { useTasksStore } from "../state/tasks.store";
 
 export const TasksPage = () => {
-  const { id: serviceId } = useParams();
+  // Получаем ID услуги из sessionStorage
+  const getServiceId = () => {
+    return sessionStorage.getItem("serviceId");
+  };
+
   const { setServiceId, fetchTasksByService, fetchCategories, fetchMonths } =
     useTasksStore();
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
 
@@ -18,22 +20,19 @@ export const TasksPage = () => {
     let isMounted = true;
 
     const loadData = async () => {
-      if (isMounted && serviceId) {
-        setServiceId(serviceId);
-        await fetchTasksByService(serviceId);
-        await fetchCategories();
-        await fetchMonths();
+      if (isMounted) {
+        const serviceId = getServiceId();
+        if (serviceId) {
+          setServiceId(serviceId);
+          await fetchTasksByService(serviceId);
+          await fetchCategories();
+          await fetchMonths();
+        }
       }
     };
 
     loadData();
-  }, [
-    serviceId,
-    setServiceId,
-    fetchTasksByService,
-    fetchCategories,
-    fetchMonths,
-  ]);
+  }, [setServiceId, fetchTasksByService, fetchCategories, fetchMonths]);
 
   const handleTaskClick = (task) => {
     setSelectedTask(task);

@@ -12,8 +12,17 @@ export const SidebarDropdown = ({
   isActive = false,
   className = "",
   style,
+  onClick,
 }) => {
   const [isOpen, setIsOpen] = useState(isActive);
+
+  const handleHeaderClick = (e) => {
+    e.stopPropagation();
+    setIsOpen(!isOpen);
+    if (onClick) {
+      onClick();
+    }
+  };
 
   return (
     <Dropdown
@@ -27,7 +36,7 @@ export const SidebarDropdown = ({
       contentClassName="sidebar__body"
       style={style}
       trigger={
-        <div className="sidebar__head">
+        <div className="sidebar__head" onClick={handleHeaderClick}>
           <svg className={`icon icon-${icon}`}>
             <use xlinkHref={`#icon-${icon}`}></use>
           </svg>

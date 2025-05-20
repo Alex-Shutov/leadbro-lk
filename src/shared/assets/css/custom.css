@@ -35,6 +35,171 @@ header:after, .container:after, footer:after, .widget-posts-list li:after, #subs
     clear: both;
 }
 
+/* Custom styles for the calendar component */
+.calendar {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 360px;
+    padding: 24px;
+    background: #FFFFFF;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s;
+}
+
+.calendar.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.calendar__list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.calendar__item {
+    position: relative;
+}
+
+.calendar__head {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.calendar__head-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.calendar__details {
+    display: flex;
+    flex-direction: column;
+}
+
+.calendar__value {
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    font-weight: 500;
+    width: 100%;
+    cursor: pointer;
+}
+
+.calendar__body {
+    margin-top: 16px;
+}
+
+.calendar__container {
+    margin-bottom: 16px;
+}
+
+.calendar__foot {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* React DatePicker customizations */
+.react-datepicker {
+    font-family: 'Inter', sans-serif;
+    border: none;
+    box-shadow: none;
+    width: 100%;
+}
+
+.react-datepicker__month-container {
+    width: 100%;
+}
+
+.react-datepicker__header {
+    background-color: #fff;
+    border-bottom: 1px solid #EFEFEF;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--in-range {
+    background-color: #2A85FF;
+    color: white;
+}
+
+.react-datepicker__day--keyboard-selected {
+    background-color: rgba(42, 133, 255, 0.1);
+    color: #2A85FF;
+}
+
+.react-datepicker__day--in-selecting-range {
+    background-color: rgba(42, 133, 255, 0.2);
+}
+
+.react-datepicker__day:hover {
+    background-color: rgba(42, 133, 255, 0.1);
+}
+
+.button-stroke {
+    height: 36px;
+    padding: 0 16px;
+    border-radius: 8px;
+    background: #fff;
+    border: 1px solid #EFEFEF;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.button-stroke:hover {
+    background: #F4F4F4;
+}
+
+.button-small {
+    height: 32px;
+    padding: 0 12px;
+    font-size: 13px;
+}
+
+.users__button {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.confirm-period-btn {
+    background-color: #2A85FF;
+    color: white;
+    border: none;
+}
+
+.confirm-period-btn:hover {
+    background-color: #1a75e0;
+}
+
+.close-period-btn {
+    background-color: #F4F4F4;
+    color: #6F767E;
+    border: 1px solid #EFEFEF;
+}
+
+/* Mobile styles */
+@media (max-width: 767px) {
+    .calendar {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 360px;
+    }
+}
+
 /* signin page */
 
 .signin__body{
@@ -3365,7 +3530,6 @@ body.dark .requests__table-body-item div{
 }
 
 body.dark .calendar__head{
-    background: #272B30;
 }
 
 body.dark .info-modal-wrap._active .info-modal-block._active{

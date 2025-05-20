@@ -9,7 +9,6 @@ const SwiperElement = ({ items, selectedItem, onClick }) => {
             className={`shop__link js-tabs-link ${selectedItem === el.key ? "active" : ""}`}
             href="#"
             onClick={(e) => {
-              debugger;
               e.preventDefault();
               onClick(el);
             }}

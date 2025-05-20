@@ -25,7 +25,6 @@ export const useCompanyStore = create((set, get) => ({
         isLoading: false,
         isInitialized: true,
       });
-      debugger;
       return user.data;
     } catch (error) {
       set({

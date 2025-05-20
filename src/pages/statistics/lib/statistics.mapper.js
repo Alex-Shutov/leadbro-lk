@@ -119,119 +119,216 @@ export const mapRejectionsData = (apiData, dateRange) => {
     categories: categories,
   };
 };
-export const mapPositionsData = (apiData) => {
-  const positionsData = apiData.result || {};
+export const mapPositionsData = (positionsData) => {
+  if (!positionsData || !positionsData.result) {
+    return {
+      series: [],
+      categories: [],
+      stats: [],
+      topDynamics: {}
+    };
+  }
 
-  // Map series data for different position ranges
-  const top3Data = [];
-  const top10Data = [];
-  const top30Data = [];
+  const data = positionsData.result;
 
-  const dates = Object.keys(positionsData).sort();
+  // Получаем массив дат из API
+  const dates = data.dates || [];
 
-  // Process data for each date
-  dates.forEach((date) => {
-    const dateData = positionsData[date];
-    top3Data.push(dateData.top_3 || 0);
-    top10Data.push(dateData.top_10 || 0);
-    top30Data.push(dateData.top_30 || 0);
+  // Форматируем даты для отображения в формате DD.MM.YYYY
+  const formattedDates = dates.map(date => {
+    const parts = date.split('-');
+    if (parts.length === 3) {
+      return `${parts[2]}.${parts[1]}.${parts[0]}`;
+    }
+    return date;
   });
 
-  // Format categories (dates)
-  const categories = dates.map((date) => {
-    const parts = date.split("-");
-    return `${parts[2]}.${parts[1]}`;
-  });
+  // Получаем данные топов
+  const tops = data.tops || [{}, {}];
 
-  // Get stats for position ranges
+  // Получаем динамику топов
+  const topsDynamics = data.tops_dynamics || {};
+
+  // Корректное маппинг данных для каждого диапазона топов
+  const mappedTopData = mapTopRanges(tops);
+
+  // Преобразуем данные для графика
+  const series = [
+    {
+      name: "Топ 1-3",
+      data: mappedTopData.top1_3
+    },
+    {
+      name: "Топ 1-10",
+      data: mappedTopData.top1_10
+    },
+    {
+      name: "Топ 11-30",
+      data: mappedTopData.top11_30
+    },
+    {
+      name: "Топ 31-50",
+      data: mappedTopData.top31_50
+    },
+    {
+      name: "Топ 51-100",
+      data: mappedTopData.top51_100
+    },
+    {
+      name: "Топ 101+",
+      data: mappedTopData.top101_plus
+    }
+  ];
+
+  // Получаем последние данные для статистики
+  const latestTops = tops[tops.length - 1] || {};
+
+  // Считаем общее количество ключевых слов
+  const totalKeywords = Object.values(latestTops).reduce((sum, val) => sum + (val || 0), 0);
+
+  // Форматируем данные для статистики
   const stats = [
     {
       title: "Топ 1-3",
-      count: positionsData[dates[dates.length - 1]]?.top_3 || 0,
-      percentage:
-        Math.round(
-          (positionsData[dates[dates.length - 1]]?.top_3_percent || 0) * 10,
-        ) / 10,
-      color: "gray",
+      count: latestTops["1_3"] || 0,
+      percentage: totalKeywords > 0 ? Math.round((latestTops["1_3"] || 0) / totalKeywords * 100) : 0,
+      color: "gray"
     },
     {
       title: "Топ 1-10",
-      count: positionsData[dates[dates.length - 1]]?.top_10 || 0,
-      percentage:
-        Math.round(
-          (positionsData[dates[dates.length - 1]]?.top_10_percent || 0) * 10,
-        ) / 10,
-      color: "orange",
+      count: latestTops["1_10"] || 0,
+      percentage: totalKeywords > 0 ? Math.round((latestTops["1_10"] || 0) / totalKeywords * 100) : 0,
+      color: "orange"
     },
     {
-      title: "Топ 1-30",
-      count: positionsData[dates[dates.length - 1]]?.top_30 || 0,
-      percentage:
-        Math.round(
-          (positionsData[dates[dates.length - 1]]?.top_30_percent || 0) * 10,
-        ) / 10,
-      color: "purple",
+      title: "Топ 11-30",
+      count: latestTops["11_30"] || 0,
+      percentage: totalKeywords > 0 ? Math.round((latestTops["11_30"] || 0) / totalKeywords * 100) : 0,
+      color: "purple"
     },
     {
-      title: "Топ 1-50",
-      count: positionsData[dates[dates.length - 1]]?.top_50 || 0,
-      percentage:
-        Math.round(
-          (positionsData[dates[dates.length - 1]]?.top_50_percent || 0) * 10,
-        ) / 10,
-      color: "green",
+      title: "Топ 31-50",
+      count: latestTops["31_50"] || 0,
+      percentage: totalKeywords > 0 ? Math.round((latestTops["31_50"] || 0) / totalKeywords * 100) : 0,
+      color: "green"
+    },
+    {
+      title: "Топ 51-100",
+      count: latestTops["51_100"] || 0,
+      percentage: totalKeywords > 0 ? Math.round((latestTops["51_100"] || 0) / totalKeywords * 100) : 0,
+      color: "blue"
+    },
+    {
+      title: "Топ 101+",
+      count: latestTops["101_10000"] || 0,
+      percentage: totalKeywords > 0 ? Math.round((latestTops["101_10000"] || 0) / totalKeywords * 100) : 0,
+      color: "red"
     },
     {
       title: "Все запросы",
-      count: positionsData[dates[dates.length - 1]]?.total || 0,
+      count: totalKeywords,
       percentage: 100,
-      color: "default",
-    },
-    {
-      title: "WS10",
-      count: positionsData[dates[dates.length - 1]]?.ws10 || 0,
-      percentage:
-        Math.round(
-          (positionsData[dates[dates.length - 1]]?.ws10_percent || 0) * 10,
-        ) / 10,
-      color: "yellow",
-    },
-    {
-      title: "PTraf",
-      count: positionsData[dates[dates.length - 1]]?.ptraf || 0,
-      percentage:
-        Math.round(
-          (positionsData[dates[dates.length - 1]]?.ptraf_percent || 0) * 10,
-        ) / 10,
-      color: "blue",
-    },
+      color: "default"
+    }
   ];
 
   return {
-    series: [
-      {
-        name: "Daily",
-        data: top3Data,
-      },
-      {
-        name: "Weekly",
-        data: top10Data,
-      },
-      {
-        name: "Monthly",
-        data: top30Data,
-      },
-    ],
-    categories,
+    series,
+    categories: formattedDates,
     stats,
+    topDynamics: topsDynamics
+  };
+};
+
+// Вспомогательная функция для корректного маппинга данных топов
+const mapTopRanges = (tops) => {
+  // Проверяем наличие данных
+  if (!tops || tops.length === 0) {
+    return {
+      top1_3: [],
+      top1_10: [],
+      top11_30: [],
+      top31_50: [],
+      top51_100: [],
+      top101_plus: []
+    };
+  }
+
+  // Инициализируем массивы для каждого диапазона топов
+  const top1_3 = [];
+  const top1_10 = [];
+  const top11_30 = [];
+  const top31_50 = [];
+  const top51_100 = [];
+  const top101_plus = [];
+
+  // Обрабатываем каждый набор данных топов
+  tops.forEach(top => {
+    // Для Топ 1-3 берем значение "1_3" или вычисляем из "1_10", если "1_3" не указан
+    top1_3.push(top["1_3"] !== undefined ? top["1_3"] : Math.round(top["1_10"] / 3));
+
+    // Для остальных топов берем соответствующие значения
+    top1_10.push(top["1_10"] || 0);
+    top11_30.push(top["11_30"] || 0);
+    top31_50.push(top["31_50"] || 0);
+    top51_100.push(top["51_100"] || 0);
+    top101_plus.push(top["101_10000"] || 0);
+  });
+
+  return {
+    top1_3,
+    top1_10,
+    top11_30,
+    top31_50,
+    top51_100,
+    top101_plus
+  };
+};
+
+export const mapTopVisorProjectData = (projectData) => {
+  if (!projectData || !projectData.searchers) {
+    return {
+      id: null,
+      searchers: [],
+      regions: []
+    };
+  }
+
+  // Extract the project ID
+  const projectId = projectData.id;
+
+  // Map searchers
+  const searchers = projectData.searchers.map(searcher => ({
+    id: searcher.id,
+    key: searcher.key,
+    name: searcher.name,
+    enabled: searcher.enabled === 1
+  }));
+
+  // Get regions from the first searcher (if available)
+  const regions = searchers.length > 0 && projectData.searchers[0].regions ?
+      projectData.searchers[0].regions.map(region => ({
+        id: region.id,
+        key: region.key,
+        name: region.name,
+        type: region.type,
+        countryCode: region.countryCode
+      })) : [];
+
+  return {
+    id: projectId,
+    searchers,
+    regions
   };
 };
 
 export const mapTopVisorPositionsData = (
-  chartData,
-  summaryData,
-  keywordsData,
-  params,
+chartData,
+    summaryData,
+    keywordsData,
+    params,
+    selectedSearcher,
+    selectedRegion
 ) => {
   // If no data is available, return empty structure
   if (!chartData || !summaryData || !keywordsData) {
@@ -251,155 +348,122 @@ export const mapTopVisorPositionsData = (
   }
 
   try {
-    // 1. Process chart data
-    const chartResult = chartData.result || {};
-    const chartItems = chartResult.items || [];
-    const chartDates = [];
-    const chartValues = {
-      top3: [],
-      top10: [],
-      top30: [],
-      top50: [],
-      top100: [],
-    };
+    // Find the specific searcher and region in the data if provided
+    let searcherData = null;
+    let regionData = null;
 
-    // Format dates and extract position data by date
-    chartItems.forEach((item) => {
-      const dateStr = item.date;
+    if (summaryData && summaryData.searchers && selectedSearcher) {
+      searcherData = summaryData.searchers.find(
+          s => s.key === selectedSearcher.key || s.id === selectedSearcher.id
+      );
 
-      // Reformat date from YYYY-MM-DD to DD.MM
-      const dateParts = dateStr.split("-");
-      const formattedDate = `${dateParts[2]}.${dateParts[1]}`;
-
-      if (!chartDates.includes(formattedDate)) {
-        chartDates.push(formattedDate);
+      if (searcherData && searcherData.regions && selectedRegion) {
+        regionData = searcherData.regions.find(
+            r => r.key === selectedRegion.key || r.id === selectedRegion.id
+        );
       }
+    }
 
-      // Extract position counts from the data
-      // TopVisor API returns data in the format: { top_3: 5, top_10: 15, ... }
-      chartValues.top3.push(item.top_3 || 0);
-      chartValues.top10.push(item.top_10 || 0);
-      chartValues.top30.push(item.top_30 || 0);
-      chartValues.top50.push(item.top_50 || 0);
-      chartValues.top100.push(item.top_100 || 0);
+    // If we couldn't find specific data, use the overall data
+    const positionData = regionData?.positions_summary ||
+        searcherData?.positions_summary ||
+        summaryData.positions_summary || {};
+
+    // Extract dates for the chart
+    const chartDates = positionData.dates || [];
+
+    // Format dates from YYYY-MM-DD to DD.MM
+    const formattedDates = chartDates.map(date => {
+      const parts = date.split('-');
+      if (parts.length === 3) {
+        return `${parts[2]}.${parts[1]}`;
+      }
+      return date;
     });
 
-    // 2. Process summary data
-    const summaryResult = summaryData.result || {};
-    const positionSummary = summaryResult.tops || {};
+    // Create series data from tops
+    const tops = positionData.tops || [{}, {}];
 
-    // 3. Process keywords data to get total count and additional metrics
-    const keywords = keywordsData.result?.keywords || [];
-    const totalKeywords = keywords.length;
-
-    // Process WS10 and PTraf data from keywords
-    let ws10Count = 0;
-    let ptrafCount = 0;
-    keywords.forEach((keyword) => {
-      // Assuming these fields exist in the API response - adjust as needed
-      if (keyword.wordstat && parseInt(keyword.wordstat, 10) >= 10) {
-        ws10Count++;
-      }
-
-      // Check if keyword has potential traffic (you might need to adjust this based on actual API response)
-      if (
-        keyword.potential_traffic &&
-        parseInt(keyword.potential_traffic, 10) > 0
-      ) {
-        ptrafCount++;
-      }
-    });
-
-    // Get position counts from summary data
-    const top3Count = positionSummary.top_3 || 0;
-    const top10Count = positionSummary.top_10 || 0;
-    const top30Count = positionSummary.top_30 || 0;
-    const top50Count = positionSummary.top_50 || 0;
-
-    // Prepare chart series data
+    // We need to transform the data format from the API to what our chart expects
     const series = [
       {
         name: "Топ 1-3",
-        data: chartValues.top3,
+        data: tops.map(top => top["1_10"] || 0)
       },
       {
         name: "Топ 1-10",
-        data: chartValues.top10,
+        data: tops.map(top => top["11_30"] || 0)
       },
       {
         name: "Топ 1-30",
-        data: chartValues.top30,
-      },
-      {
-        name: "Топ 1-50",
-        data: chartValues.top50,
-      },
+        data: tops.map(top => top["31_50"] || 0)
+      }
     ];
 
-    // Prepare stats data
+    // Prepare stats for the UI
+    const allKeywords = (positionData.tops && positionData.tops[0] &&
+        Object.values(positionData.tops[0]).reduce((sum, val) => sum + val, 0)) || 0;
+
+    const latestTops = tops[tops.length - 1] || {};
+
     const stats = [
       {
         title: "Топ 1-3",
-        count: top3Count,
-        percentage:
-          totalKeywords > 0 ? Math.round((top3Count / totalKeywords) * 100) : 0,
-        color: "gray",
+        count: latestTops["1_10"] || 0,
+        percentage: allKeywords ? Math.round((latestTops["1_10"] || 0) / allKeywords * 100) : 0,
+        color: "gray"
       },
       {
         title: "Топ 1-10",
-        count: top10Count,
-        percentage:
-          totalKeywords > 0
-            ? Math.round((top10Count / totalKeywords) * 100)
-            : 0,
-        color: "orange",
+        count: latestTops["11_30"] || 0,
+        percentage: allKeywords ? Math.round((latestTops["11_30"] || 0) / allKeywords * 100) : 0,
+        color: "orange"
       },
       {
         title: "Топ 1-30",
-        count: top30Count,
-        percentage:
-          totalKeywords > 0
-            ? Math.round((top30Count / totalKeywords) * 100)
-            : 0,
-        color: "purple",
+        count: latestTops["31_50"] || 0,
+        percentage: allKeywords ? Math.round((latestTops["31_50"] || 0) / allKeywords * 100) : 0,
+        color: "purple"
       },
       {
         title: "Топ 1-50",
-        count: top50Count,
-        percentage:
-          totalKeywords > 0
-            ? Math.round((top50Count / totalKeywords) * 100)
-            : 0,
-        color: "green",
+        count: latestTops["51_100"] || 0,
+        percentage: allKeywords ? Math.round((latestTops["51_100"] || 0) / allKeywords * 100) : 0,
+        color: "green"
       },
       {
         title: "Все запросы",
-        count: totalKeywords,
+        count: allKeywords,
         percentage: 100,
-        color: "default",
-      },
-      {
-        title: "WS10",
-        count: ws10Count,
-        percentage:
-          totalKeywords > 0 ? Math.round((ws10Count / totalKeywords) * 100) : 0,
-        color: "yellow",
-      },
-      {
-        title: "PTraf",
-        count: ptrafCount,
-        percentage:
-          totalKeywords > 0
-            ? Math.round((ptrafCount / totalKeywords) * 100)
-            : 0,
-        color: "blue",
-      },
+        color: "default"
+      }
     ];
+
+    // Add WS10 and PTraf stats if available
+    if (keywordsData && keywordsData.keywords) {
+      const ws10Count = keywordsData.keywords.filter(kw => kw.wordstat && parseInt(kw.wordstat) >= 10).length;
+      const ptrafCount = keywordsData.keywords.filter(kw => kw.potential_traffic && parseInt(kw.potential_traffic) > 0).length;
+
+      stats.push(
+          {
+            title: "WS10",
+            count: ws10Count,
+            percentage: allKeywords ? Math.round(ws10Count / allKeywords * 100) : 0,
+            color: "yellow"
+          },
+          {
+            title: "PTraf",
+            count: ptrafCount,
+            percentage: allKeywords ? Math.round(ptrafCount / allKeywords * 100) : 0,
+            color: "blue"
+          }
+      );
+    }
 
     return {
       series,
-      categories: chartDates,
-      stats,
+      categories: formattedDates,
+      stats
     };
   } catch (error) {
     console.error("Error mapping TopVisor data:", error);
@@ -547,16 +611,13 @@ export const mapGoalsData = (
 ) => {
   // Базовая обработка данных
   const data = mapYandexMetrikaData(
-    apiData,
-    selectedConversion === "Показать все конверсии"
-      ? "Конверсии"
-      : selectedConversion,
-    dateRange,
+      apiData,
+      selectedConversion || "Конверсии",
+      dateRange,
   );
 
   // Добавляем список доступных конверсий
   const conversions = [
-    "Показать все конверсии",
     ...(goalsData?.goals?.map((goal) => goal.name) || []),
   ];
 

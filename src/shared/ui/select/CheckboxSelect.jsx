@@ -1,18 +1,25 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 export const CheckboxSelect = ({
   title = "0 группы запросов",
   options = [],
   selected = [],
   onChange,
+  isSingleSelect = false, // Add this parameter
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleToggle = (option) => {
-    if (selected.includes(option)) {
-      onChange(selected.filter((item) => item !== option));
+    if (isSingleSelect) {
+      // Single select mode
+      onChange([option]);
     } else {
-      onChange([...selected, option]);
+      // Multi-select mode (original behavior)
+      if (selected.includes(option)) {
+        onChange(selected.filter((item) => item !== option));
+      } else {
+        onChange([...selected, option]);
+      }
     }
   };
 
@@ -45,9 +52,14 @@ export const CheckboxSelect = ({
             <label className="checkbox">
               <input
                 className="checkbox__input"
-                type="checkbox"
-                checked={selected.includes(option)}
+                type={isSingleSelect ? "radio" : "checkbox"}
+                checked={
+                  isSingleSelect
+                    ? selected[0] === option
+                    : selected.includes(option)
+                }
                 onChange={() => handleToggle(option)}
+                name={isSingleSelect ? "singleSelectGroup" : undefined}
               />
               <span className="checkbox__inner">
                 <span className="checkbox__tick"></span>

@@ -1,7 +1,6 @@
 import { loadAvatar } from "../../../core/lib/mapper.utils";
 
 export const onMeMapper = ({ data }) => {
-  debugger;
   data = data.data;
   return {
     data: {

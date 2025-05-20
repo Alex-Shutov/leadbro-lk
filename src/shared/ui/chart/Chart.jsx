@@ -1,3 +1,4 @@
+// src/shared/ui/chart/Chart.jsx
 import React, { useEffect, useRef } from "react";
 import ApexCharts from "apexcharts";
 import "react-loading-skeleton/dist/skeleton.css";
@@ -5,81 +6,120 @@ import "./chart.css";
 import { SkeletonLoader } from "../loader";
 
 export const Chart = ({
-  id,
-  type = "line",
-  series,
-  categories,
-  height = "300px",
-  colors = ["#2A85FF", "#B5E4CA", "#B1E5FC"],
-  isLoading = false,
-  skeletonOpacity = 0.5,
-}) => {
+                        id,
+                        type = "line",
+                        series,
+                        categories,
+                        height = "300px",
+                        colors = ["#2A85FF", "#B5E4CA", "#B1E5FC", "#83BF6E", "#FF6A55", "#8E59FF"],
+                        isLoading = false,
+                        skeletonOpacity = 0.5,
+                        topDynamics = {} // Новый параметр для динамики топов
+                      }) => {
   const chartRef = useRef(null);
   const containerRef = useRef(null);
 
   useEffect(() => {
     if (!isLoading && series && categories && containerRef.current) {
-      // Sort categories and corresponding data points
+      // Сортируем категории и соответствующие точки данных
       let sortedCategories = [...categories];
       let sortedSeries = JSON.parse(JSON.stringify(series));
 
-      // Convert date strings to actual Date objects for proper sorting
+      // Преобразуем строки даты в объекты Date для правильной сортировки
       const dateObjects = sortedCategories.map((cat) => {
-        // Handle different date formats - if it's DD.MM or DD.MM.YYYY
+        // Обрабатываем разные форматы даты - DD.MM или DD.MM.YYYY
         const parts = cat.split(".");
         if (parts.length === 2) {
-          // Assume current year if only DD.MM format
+          // Предполагаем текущий год, если формат только DD.MM
           const currentYear = new Date().getFullYear();
           return new Date(
-            currentYear,
-            parseInt(parts[1]) - 1,
-            parseInt(parts[0]),
+              currentYear,
+              parseInt(parts[1]) - 1,
+              parseInt(parts[0]),
           );
         } else if (parts.length === 3) {
-          // DD.MM.YYYY format
+          // Формат DD.MM.YYYY
           return new Date(
-            parseInt(parts[2]),
-            parseInt(parts[1]) - 1,
-            parseInt(parts[0]),
+              parseInt(parts[2]),
+              parseInt(parts[1]) - 1,
+              parseInt(parts[0]),
           );
         } else if (cat.includes("/")) {
-          // Handle MM/DD/YYYY or DD/MM/YYYY format if used
+          // Обрабатываем MM/DD/YYYY или DD/MM/YYYY форматы, если используются
           const slashParts = cat.split("/");
           if (slashParts.length === 3) {
             return new Date(
-              parseInt(slashParts[2]),
-              parseInt(slashParts[0]) - 1,
-              parseInt(slashParts[1]),
+                parseInt(slashParts[2]),
+                parseInt(slashParts[0]) - 1,
+                parseInt(slashParts[1]),
             );
           }
         }
 
-        // If it's in a date format like "18.04" or "27.04"
+        // Если формат даты типа "18.04" или "27.04"
         const matches = cat.match(/(\d+)\.(\d+)/);
         if (matches) {
           const day = parseInt(matches[1]);
-          const month = parseInt(matches[2]) - 1; // JS months are 0-indexed
+          const month = parseInt(matches[2]) - 1; // JS месяцы начинаются с 0
           const currentYear = new Date().getFullYear();
           return new Date(currentYear, month, day);
         }
 
-        return new Date(); // Fallback for invalid formats
+        return new Date(); // Запасной вариант для некорректных форматов
       });
 
-      // Create an array of indices to track the original positions
+      // Создаем массив индексов для отслеживания исходных позиций
       const indices = dateObjects.map((_, index) => index);
 
-      // Sort the indices based on the date objects
+      // Сортируем индексы на основе объектов Date
       indices.sort((a, b) => dateObjects[a] - dateObjects[b]);
 
-      // Reorder categories based on sorted indices
+      // Переупорядочиваем категории на основе отсортированных индексов
       sortedCategories = indices.map((i) => categories[i]);
 
-      // Reorder data points in each series to match sorted categories
+      // Переупорядочиваем точки данных в каждой серии соответственно отсортированным категориям
       sortedSeries = sortedSeries.map((s) => {
         const newData = indices.map((i) => s.data[i]);
         return { ...s, data: newData };
       });
+
+      // Настраиваем tooltip для отображения динамики топов
+      const customTooltip = {
+        enabled: true,
+        shared: true,
+        intersect: false,
+        custom: function({ series, seriesIndex, dataPointIndex, w }) {
+          const seriesName = w.globals.seriesNames[seriesIndex];
+          const value = series[seriesIndex][dataPointIndex];
+          const category = w.globals.categoryLabels[dataPointIndex];
+
+          // Получаем динамику для текущего топа (если есть)
+          const topKey = seriesName.replace("Топ ", "").replace("-", "_");
+          const dynamicValue = topDynamics[topKey] || 0;
+
+          // Определяем цвет для динамики
+          const dynamicColor = dynamicValue > 0 ? "#26842A" :
+              dynamicValue < 0 ? "#FF6A55" : "#6F767E";
+
+          // Создаем HTML для tooltip
+          return `
+            <div class="apexcharts-tooltip-title" style="padding: 8px 10px; font-weight: bold; margin-bottom: 5px; background-color: #f8f9fa;">
+              ${category}
+            </div>
+            <div class="apexcharts-tooltip-series-group" style="padding: 8px 10px; display: flex; flex-direction: column;">
+              <div style="color: ${w.globals.colors[seriesIndex]}; font-weight: bold; margin-bottom: 5px;">
+                ${seriesName}
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span>Значение: ${value}</span>
+                <span style="color: ${dynamicColor}; font-weight: bold; margin-left: 10px;">
+                  ${dynamicValue > 0 ? '+' : ''}${dynamicValue}%
+                </span>
+              </div>
+            </div>
+          `;
+        }
+      };
 
       const options = {
         grid: {
@@ -92,7 +132,24 @@ export const Chart = ({
           },
         },
         legend: {
-          show: false,
+          show: true,
+          position: 'top',
+          horizontalAlign: 'left',
+          offsetY: 0,
+          offsetX: 0,
+          fontSize: '12px',
+          fontFamily: 'Inter, sans-serif',
+          markers: {
+            width: 12,
+            height: 12,
+            radius: 12
+          },
+          onItemClick: {
+            toggleDataSeries: true
+          },
+          onItemHover: {
+            highlightDataSeries: true
+          }
         },
         colors,
         series: sortedSeries,
@@ -141,6 +198,13 @@ export const Chart = ({
             },
           },
         },
+        tooltip: customTooltip,
+        markers: {
+          size: 5,
+          hover: {
+            size: 7
+          }
+        },
         responsive: [
           {
             breakpoint: 768,
@@ -184,24 +248,24 @@ export const Chart = ({
         chartRef.current = null;
       }
     };
-  }, [id, type, series, categories, height, colors, isLoading]);
+  }, [id, type, series, categories, height, colors, isLoading, topDynamics]);
 
   return (
-    <div
-      ref={containerRef}
-      className="chart-container"
-      style={{
-        height,
-        width: "100%",
-        position: "relative",
-        minHeight: "200px",
-      }}
-    >
-      {isLoading ? (
-        <SkeletonLoader height="100%" width="100%" opacity={skeletonOpacity} />
-      ) : (
-        <div id={id} style={{ height: "100%", width: "100%" }} />
-      )}
-    </div>
+      <div
+          ref={containerRef}
+          className="chart-container"
+          style={{
+            height,
+            width: "100%",
+            position: "relative",
+            minHeight: "200px",
+          }}
+      >
+        {isLoading ? (
+            <SkeletonLoader height="100%" width="100%" opacity={skeletonOpacity} />
+        ) : (
+            <div id={id} style={{ height: "100%", width: "100%" }} />
+        )}
+      </div>
   );
 };

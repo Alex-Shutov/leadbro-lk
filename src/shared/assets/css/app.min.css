@@ -3565,12 +3565,14 @@ body.dark .sidebar__item[href].active .icon, body.dark .sidebar__help.active .ic
     box-shadow: inset 0px -2px 1px rgba(0, 0, 0, 0.05), inset 0px 1px 1px #FFFFFF; }
 .sidebar__item.active {
     background-color: #f0f0f0;
-    border-left: 3px solid #2e7d32;
+}
+.sidebar__item svg{
+    top:2px;
+    position:  relative;
 }
 
 .seo-mobile.active {
     background-color: #f0f0f0;
-    border-left: 3px solid #2e7d32;
 }
 body.dark .sidebar__item[href].active, body.dark .sidebar__help.active {
     background: #272B30;
@@ -3639,6 +3641,9 @@ body.dark .sidebar__top.active .sidebar__head {
         color: #6F767E; }
     body.dark .sidebar__item.visible:not(.wide) .sidebar__head .icon {
         fill: #6F767E; } }
+.sidebar__item{
+    padding-top: 8px;
+}
 @media only screen and (max-width: 1259px) {
     .sidebar__head {
         font-size: 0; } }
@@ -3665,6 +3670,7 @@ body.dark .sidebar__top.active .sidebar__head {
 @media only screen and (max-width: 767px) {
     .sidebar__head .icon:last-child {
         display: inline-block; } }
+
 .sidebar__add {
     position: absolute;
     top: 50%;

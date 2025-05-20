@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -41,27 +41,19 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/*<Route*/}
-        {/*  path="/"*/}
-        {/*  element={*/}
-        {/*    <ProtectedRoute>*/}
-        {/*      <HomePage />*/}
-        {/*    </ProtectedRoute>*/}
-        {/*  }*/}
-        {/*/>*/}
         <Route
-          path="/services/:id/tasks"
+          path="/statistics"
           element={
             <ProtectedRoute>
-              <TasksPage />
+              <StatisticsPage />
             </ProtectedRoute>
           }
         />
         <Route
-          path="/"
+          path="/tasks"
           element={
             <ProtectedRoute>
-              <StatisticsPage />
+              <TasksPage />
             </ProtectedRoute>
           }
         />
@@ -81,9 +73,14 @@ function App() {
             </ProtectedRoute>
           }
         />
-        {/*<Route path="/signin" element={<SigninPage />} />*/}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+            </ProtectedRoute>
+          }
+        />
         <Route path="/signin" element={<SignInPage2 />} />
-        {/*<Route path="/signin-sms" element={<SigninPage smsVerification />} />*/}
       </Routes>
     </Router>
   );
