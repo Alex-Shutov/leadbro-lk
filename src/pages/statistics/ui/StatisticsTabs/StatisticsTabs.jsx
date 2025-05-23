@@ -3,6 +3,8 @@ import { StatCard } from "../../widgets/StatCard";
 import { InfoModal } from "../../widgets/InfoModal";
 import { Chart } from "../../../../shared/ui/chart";
 import { Select } from "../../../../shared/ui/select";
+import LockedCard from "../../../../widgets/common/ui/LockedCard";
+import { serviceHasMetricsData } from "../../../../core/lib/utils";
 
 export const StatisticsTabs = ({
   visits,
@@ -14,68 +16,88 @@ export const StatisticsTabs = ({
   graphType,
   selectedConversion,
   onConversionChange,
+  serviceType,
 }) => {
   const [visitsInfoOpen, setVisitsInfoOpen] = useState(false);
   const [rejectionsInfoOpen, setRejectionsInfoOpen] = useState(false);
   const [goalsInfoOpen, setGoalsInfoOpen] = useState(false);
+  const enableVisitsCard = serviceHasMetricsData(serviceType);
+  const enableRejectionsCard = serviceHasMetricsData(serviceType);
+  const enableGoaldCard = true;
 
   return (
     <div className="page__col graphs__container">
       {/* Visits Card */}
       <StatCard
         title="Визиты из поисковых систем"
-        value={visits?.value || "-"}
+        value={enableVisitsCard ? visits?.value || "-" : null}
         change={visits?.change}
         comparedTo={visits?.comparedTo}
-        onInfoClick={() => setVisitsInfoOpen(true)}
+        onInfoClick={enableVisitsCard ? () => setVisitsInfoOpen(true) : null}
       >
-        {visitsInfoOpen && (
+        {visitsInfoOpen && enableVisitsCard && (
           <InfoModal
             title="Визиты из поисковых систем"
             description="Этот график показывает общее количество визитов из поисковых систем. Эти данные помогают отслеживать эффективность поисковой оптимизации и понимать, как меняется поисковый трафик с течением времени."
             onClose={() => setVisitsInfoOpen(false)}
           />
         )}
-        <Chart
-          id="search-visits"
-          type={graphType}
-          series={visits?.series}
-          categories={visits?.categories}
-          isLoading={visitsLoading}
-        />
+        {enableVisitsCard ? (
+          <Chart
+            id="search-visits"
+            type={graphType}
+            series={visits?.series}
+            categories={visits?.categories}
+            isLoading={visitsLoading}
+          />
+        ) : (
+          <LockedCard label={"Подключить VisitsTracking"} />
+        )}
       </StatCard>
 
       {/* Rejections Card */}
       <StatCard
         title="Отказы"
-        value={rejections?.value + "%" || "-"}
+        value={enableRejectionsCard ? (rejections?.value ?? "--") + "%" : null}
         change={rejections?.change}
         comparedTo={rejections?.comparedTo}
-        onInfoClick={() => setRejectionsInfoOpen(true)}
+        onInfoClick={
+          enableRejectionsCard ? () => setRejectionsInfoOpen(true) : null
+        }
       >
-        {rejectionsInfoOpen && (
+        {rejectionsInfoOpen && enableRejectionsCard && (
           <InfoModal
             title="Отказы"
             description="Этот график показывает общий процент отказов. Отказом считается визит, в рамках которого сосотоялся просмотр лишь одной страницы, продолжающийся менее 15 секунд. Этот показатель демонстрирует, насколько сайт соответствует запросу пользователя. Чем ниже процент отказов, тем лучше."
             onClose={() => setRejectionsInfoOpen(false)}
           />
         )}
-        <Chart
-          id="rejections"
-          type={graphType}
-          series={rejections?.series}
-          categories={rejections?.categories}
-          isLoading={rejectionsLoading}
-        />
+        {enableRejectionsCard ? (
+          <Chart
+            id="rejections"
+            type={graphType}
+            series={rejections?.series}
+            categories={rejections?.categories}
+            isLoading={rejectionsLoading}
+          />
+        ) : (
+          <LockedCard label={"Подключить RejectTracking"} />
+        )}
       </StatCard>
 
       {/* Goals Card */}
       <StatCard
         title="Выполненные цели"
-        value={goals?.value !== 0 ? goals?.value + "%" || "-" : "Нет данных"}
+        value={
+          enableRejectionsCard
+            ? goals?.value !== 0
+              ? (goals?.value ?? "--") + "%"
+              : "Нет данных"
+            : null
+        }
         change={goals?.value !== 0 ? goals?.change : null}
         comparedTo={goals?.comparedTo}
-        onInfoClick={() => setGoalsInfoOpen(true)}
+        onInfoClick={enableRejectionsCard ? () => setGoalsInfoOpen(true) : null}
       >
         {goalsInfoOpen && (
           <InfoModal
@@ -84,40 +106,38 @@ export const StatisticsTabs = ({
             onClose={() => setGoalsInfoOpen(false)}
           />
         )}
-        <Chart
-          id="goals"
-          type={graphType}
-          series={goals?.series}
-          categories={goals?.categories}
-          isLoading={goalsLoading}
-          height="100px"
-        />
-        <div className="card__select">
-          <Select
-            options={
-              goals?.conversions?.map((conv) => ({
-                value: conv,
-                label: conv,
-              })) || []
-            }
-            value={selectedConversion}
-            onChange={onConversionChange}
+        {enableRejectionsCard ? (
+          <Chart
+            id="goals"
+            type={graphType}
+            series={goals?.series}
+            categories={goals?.categories}
+            isLoading={goalsLoading}
+            height="100px"
           />
-        </div>
+        ) : (
+          <LockedCard label={"Подключить GoalTracking"} />
+        )}
+        {enableRejectionsCard && (
+          <div className="card__select">
+            <Select
+              options={
+                goals?.conversions?.map((conv) => ({
+                  value: conv,
+                  label: conv,
+                })) || []
+              }
+              value={selectedConversion}
+              onChange={onConversionChange}
+            />
+          </div>
+        )}
       </StatCard>
 
       {/* Calltracking Card */}
-      <div className="total card">
-        <div className="card__head">
-          <div className="title-blue card__title" style={{ padding: 0 }}>
-            Количество звонков с сайта
-          </div>
-        </div>
-        <img src="img/custom/Locked.svg" alt="" />
-        <a href="/" className="requests__titles-btn">
-          Подключить Calltracking
-        </a>
-      </div>
+      <StatCard title={"Количество звонков с сайта"}>
+        <LockedCard label={"Подключить CallTracking"} />
+      </StatCard>
     </div>
   );
 };

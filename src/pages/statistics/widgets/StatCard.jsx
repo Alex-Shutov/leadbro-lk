@@ -45,26 +45,28 @@ export const StatCard = ({
           </button>
         )}
       </div>
-      <div className="total__details info-modal-block">
-        <div className="h4 total__title">{value}</div>
-        {change !== undefined && change !== null && (
-          <div className="total__line">
-            <div
-              className={`balance background ${isPositive ? "positive" : "negative"}`}
-            >
-              <svg
-                className={`icon icon-arrow-${isPositive ? "top" : "bottom"}`}
+      {value && (
+        <div className="total__details info-modal-block">
+          <div className="h4 total__title">{value ?? "--"}</div>
+          {change !== undefined && change !== null && (
+            <div className="total__line">
+              <div
+                className={`balance background ${isPositive ? "positive" : "negative"}`}
               >
-                <use
-                  xlinkHref={`#icon-arrow-${isPositive ? "top" : "bottom"}`}
-                ></use>
-              </svg>
-              {Math.abs(change)}%
+                <svg
+                  className={`icon icon-arrow-${isPositive ? "top" : "bottom"}`}
+                >
+                  <use
+                    xlinkHref={`#icon-arrow-${isPositive ? "top" : "bottom"}`}
+                  ></use>
+                </svg>
+                {Math.abs(change)}%
+              </div>
+              по сравнению с {comparedTo}
             </div>
-            по сравнению с {comparedTo}
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
       {children}
     </div>
   );

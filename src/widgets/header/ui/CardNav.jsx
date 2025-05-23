@@ -1,8 +1,7 @@
 import React from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Icon } from "../../../shared/ui/icon";
-
-const noStatsServiceTypes = ["development", "improvements", "marketplace"];
+import { noStatsServiceTypes } from "../../../core/lib/utils";
 
 export const CardNav = ({
   isInsideSidebar = false,
@@ -32,21 +31,11 @@ export const CardNav = ({
   // Массив путей, где нужно показывать кнопку "Назад"
   const specialPaths = ["tasks", "reports"]; // Можно добавлять другие
 
-  // Проверяем, находимся ли мы на специальной странице
-  const shouldShowBackButton =
-    !isInsideSidebar &&
-    specialPaths.some((path) => location.pathname.includes(path));
-
-  // Обработчик для кнопки "Назад"
-  const handleGoBack = () => {
-    navigate(-1);
-  };
-
   // Если компонент внутри сайдбара и не активен, не отображаем его
   if (isInsideSidebar && !isActive) {
     return null;
   }
-
+  console.log(navPages, "navPages", serviceType);
   return (
     <div className="card__nav">
       {navPages.map((link, index) => (

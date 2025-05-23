@@ -4,26 +4,42 @@ import { SidebarDropdown } from "./SidebarDropdown";
 import { useCompany } from "../../../pages/company";
 import { Icon } from "../../../shared/ui/icon";
 import { CardNav } from "../../header/ui/CardNav";
+import {
+  getActiveServiceFromStorage,
+  noStatsServiceTypes,
+  setActiveServiceInStorage,
+  setActiveServiceTypeInStorage,
+} from "../../../core/lib/utils";
 
 const serviceIcons = {
-  seo: "goal",
-  contextual: "goal",
-  development: "dev",
-  smm: "activity",
-  advertisement: "promotion",
-  context: "target",
-  target: "target",
-  support: "message",
-  reputation: "star-stroke",
-  design: "image",
-  leadgen: "user",
-  marketplace: "store",
-  improvements: "setting",
-  default: "bar-chart",
+  seo: { name: "seo", viewBox: "0 0 560 560", size: 24 },
+  development: {
+    name: "dev",
+    viewBox: "0 0 24 24 ",
+    size: 24,
+    style: { color: "#857e7e" },
+  },
+  advertisement: {
+    name: "ads",
+    viewBox: "0 0 2200 2200 ",
+    size: 24,
+    style: { color: "#857e7e" },
+  },
+  context: {
+    name: "context",
+    viewBox: "0 0 48 48",
+    size: 20,
+    style: { color: "#857e7e" },
+  },
+  target: { name: "goal", viewBox: "0 0 24 24", size: 24 },
+  support: { name: "help", viewBox: "0 0 24 24", size: 24 },
+  reputation: { name: "star-stroke", viewBox: "0 0 24 24", size: 24 },
+  design: { name: "design", viewBox: "0 0 24 24", size: 24 },
+  leadgen: { name: "user", viewBox: "0 0 24 24", size: 24 },
+  marketplace: { name: "store", viewBox: "0 0 24 24", size: 24 },
+  improvements: { name: "setting", viewBox: "0 0 24 24", size: 24 },
+  default: { name: "bar-chart", viewBox: "0 0 24 24", size: 24 },
 };
-
-// Типы услуг, для которых не показываем "Статистика"
-const noStatsServiceTypes = ["development", "improvements", "marketplace"];
 
 // Функция для генерации страниц в зависимости от типа услуги
 const getServicePages = (serviceType) => {
@@ -41,18 +57,6 @@ const getServicePages = (serviceType) => {
   return pages;
 };
 
-// Функция для установки активной услуги в sessionStorage
-const setActiveServiceInStorage = (serviceId) => {
-  if (serviceId) {
-    sessionStorage.setItem("serviceId", serviceId);
-  }
-};
-
-// Функция для получения активной услуги из sessionStorage
-const getActiveServiceFromStorage = () => {
-  return sessionStorage.getItem("serviceId");
-};
-
 export const SidebarMenu = ({ isExpanded }) => {
   const { services, isLoading } = useCompany();
   const location = useLocation();
@@ -67,16 +71,19 @@ export const SidebarMenu = ({ isExpanded }) => {
       const storedServiceId = getActiveServiceFromStorage();
       if (!storedServiceId) {
         const firstServiceId = services[0].id;
+        const firstServiceType = services[0].type;
         setActiveServiceInStorage(firstServiceId);
+        setActiveServiceTypeInStorage(firstServiceType);
         setActiveService(firstServiceId);
       }
     }
   }, [services, isLoading]);
 
   // Обработчик нажатия на услугу
-  const handleServiceClick = (serviceId) => {
-    setActiveServiceInStorage(serviceId);
-    setActiveService(serviceId);
+  const handleServiceClick = (service) => {
+    setActiveServiceInStorage(service.id);
+    setActiveServiceTypeInStorage(service.type);
+    setActiveService(service.id);
   };
 
   if (isLoading) {
@@ -93,7 +100,7 @@ export const SidebarMenu = ({ isExpanded }) => {
         const icon = serviceIcons[service.type] || serviceIcons.default;
         const pages = getServicePages(service.type);
         const isActive = Number(activeService) === Number(service.id);
-
+        const iconConfig = serviceIcons[service.type] || serviceIcons.default;
         return (
           <React.Fragment key={service.id || index}>
             <SidebarDropdown
@@ -105,27 +112,33 @@ export const SidebarMenu = ({ isExpanded }) => {
               isActive={isActive}
               style={{ marginTop: index === 0 ? "25px" : "0" }}
               className={`seo-mobile ${isActive ? "active" : ""}`}
-              onClick={() => handleServiceClick(service.id)}
+              onClick={() => handleServiceClick(service)}
             />
 
             <Link
               className={`sidebar__item ${index === 0 ? "seo-pc" : ""} ${isActive ? "active" : ""}`}
               style={{ marginTop: index === 0 ? "25px" : "0" }}
               to={pages.length > 0 ? pages[0].to : "#"}
-              onClick={() => handleServiceClick(service.id)}
+              onClick={() => handleServiceClick(service)}
             >
-              <Icon className={"icon"} name={icon} viewBox={"0 0 24 24"} />
+              <Icon
+                className={"icon"}
+                name={icon}
+                viewBox={"0 0 24 24"}
+                size={24}
+                {...iconConfig}
+              />
               <span className={"name"}>{service.name}</span>
             </Link>
 
-            {isActive && (
-              <CardNav
-                isInsideSidebar={true}
-                serviceType={service.type}
-                pages={pages}
-                isActive={isActive}
-              />
-            )}
+            {/*{isActive && (*/}
+            {/*  <CardNav*/}
+            {/*    isInsideSidebar={true}*/}
+            {/*    serviceType={service.type}*/}
+            {/*    pages={pages}*/}
+            {/*    isActive={isActive}*/}
+            {/*  />*/}
+            {/*)}*/}
           </React.Fragment>
         );
       })}

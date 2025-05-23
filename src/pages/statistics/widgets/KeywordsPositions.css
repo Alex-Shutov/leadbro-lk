@@ -1,0 +1,312 @@
+/* Keywords Positions Component Styles - High Priority Version */
+/* Повышенная специфичность для перезаписи существующих стилей */
+
+/* CSS переменные для цветов позиций */
+:root {
+    --color-summary-top-3: #3198DD;
+    --color-summary-top-10: #21936C;
+    --color-summary-top-30: #1ABC9C;
+    --color-summary-top-50: #94DA90;
+    --color-summary-top-100: #BCC8C8;
+    --color-summary-top-10000: #FCC53B;
+    --color-table-top-1: #B3D2FF;
+    --color-table-top-2: #CCE0FF;
+    --color-table-top-3: #CCE0FF;
+    --color-table-top-4: #8AF3B7;
+    --color-table-top-5: #98F5C1;
+    --color-table-top-6: #A2F7C8;
+    --color-table-top-7: #ACF9CE;
+    --color-table-top-8: #B6FBD5;
+    --color-table-top-9: #BFFDDB;
+    --color-table-top-10: #CCFFE4;
+    --color-table-move-up-10: #8AF3B7;
+    --color-table-move-up-9: #8AF3B7;
+    --color-table-move-up-8: #A2F7C8;
+    --color-table-move-up-7: #A2F7C8;
+    --color-table-move-up-6: #B6FBD5;
+    --color-table-move-up-5: #B6FBD5;
+    --color-table-move-up-4: #BFFDDB;
+    --color-table-move-up-3: #BFFDDB;
+    --color-table-move-up-2: #CCFFE4;
+    --color-table-move-up-1: #CCFFE4;
+    --color-table-move-0: #FCFEFD;
+    --color-table-move-down-1: #FFF1F0;
+    --color-table-move-down-2: #FFF1F0;
+    --color-table-move-down-3: #FFF1F0;
+    --color-table-move-down-4: #FFF1F0;
+    --color-table-move-down-5: #FFE7E6;
+    --color-table-move-down-6: #FFE7E6;
+    --color-table-move-down-7: #FFE7E6;
+    --color-table-move-down-8: #FFD5D4;
+    --color-table-move-down-9: #FFD5D4;
+    --color-table-move-down-10: #FFD5D4;
+    --color-table-down: #FFF1F0;
+    --color-table-up: #CCFFE4;
+    --color-table-down-10: #FFE7E6;
+    --color-table-up-10: #BFFDDB;
+    --color-table-featured-snippet: #F6F2A0;
+    --color-table-not-found: #FFF6C6;
+    --color-table-empty: #F6F6F8;
+    --color-snapshot-panel-gradient-1: rgba(255, 255, 255, .5);
+    --color-snapshot-panel-gradient-2: rgba(255, 255, 255, .8);
+    --color-snippet-title: #1A0DAB;
+    --color-snippet-title-visited: #660099;
+    --color-snippet-url: #007700
+}
+
+
+.requests.requests-yandex .requests__table .requests__table-body .requests__table-body-row .requests__table-positions .position-cell {
+    /*border-radius: 4px !important;*/
+    /*padding: 4px 8px !important;*/
+    /*margin: 2px !important;*/
+    /*font-weight: 500 !important;*/
+    position: relative !important;
+    text-align: center !important;
+    min-width: 30px !important;
+    transition: all 0.2s ease !important;
+    /*display: inline-block !important;*/
+}
+
+body.dark .requests.requests-yandex .requests__table .requests__table-body .requests__table-body-row .requests__table-positions .position-cell{
+    background-color:#fff;
+    color: #2B323B !important;
+}
+
+
+
+/* Движение позиций с высокой специфичностью */
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.move1 {
+    background-color: var(--color-table-move-up-1) !important;
+    color: #065f46 !important;
+}
+
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.move2 {
+    background-color: var(--color-table-move-up-2) !important;
+    color: #065f46 !important;
+}
+
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.move3 {
+    background-color: var(--color-table-move-up-3) !important;
+    color: #2B323B !important;
+}
+
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.move4 {
+    background-color: var(--color-table-move-up-4) !important;
+    color: #2B323B !important;
+}
+
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.move5 {
+    background-color: var(--color-table-move-up-5) !important;
+    color: #2B323B !important;
+}
+
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.move6 {
+    background-color: var(--color-table-move-up-6) !important;
+    color: #2B323B !important;
+}
+
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.move7 {
+    background-color: var(--color-table-move-up-7) !important;
+    color: #2B323B !important;
+}
+
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.move8 {
+    background-color: var(--color-table-move-up-8) !important;
+    color: #2B323B !important;
+}
+
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.move9 {
+    background-color: var(--color-table-move-up-9) !important;
+    color: #2B323B !important;
+}
+
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.move10 {
+    background-color: var(--color-table-move-up-10) !important;
+    color: #2B323B !important;
+}
+
+/* Движение вниз */
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.move-1 {
+    background-color: var(--color-table-move-down-1) !important;
+    color: #7f1d1d !important;
+}
+
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.move-2 {
+    background-color: var(--color-table-move-down-2) !important;
+    color: #7f1d1d !important;
+}
+
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.move-3 {
+    background-color: var(--color-table-move-down-3) !important;
+    color: #2B323B !important;
+}
+
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.move-4 {
+    background-color: var(--color-table-move-down-4) !important;
+    color: #2B323B !important;
+}
+
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.move-5 {
+    background-color: var(--color-table-move-down-5) !important;
+    color: #2B323B !important;
+}
+
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.move-6 {
+    background-color: var(--color-table-move-down-6) !important;
+    color: #2B323B !important;
+}
+
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.move-7 {
+    background-color: var(--color-table-move-down-7) !important;
+    color: #2B323B !important;
+}
+
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.move-8 {
+    background-color: var(--color-table-move-down-8) !important;
+    color: #2B323B !important;
+}
+
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.move-9 {
+    background-color: var(--color-table-move-down-9) !important;
+    color: #2B323B !important;
+}
+
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.move-10 {
+    background-color: var(--color-table-move-down-10) !important;
+    color: #2B323B !important;
+}
+
+/* Без изменений */
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.move0 {
+    background-color: var(--color-table-move-0) !important;
+    color: #6b7280 !important;
+}
+
+/* Не найдено */
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.not-found {
+    background-color: var(--color-table-not-found) !important;
+    color: #2B323B !important;
+}
+
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.not-found::after {
+}
+
+/* Пустая ячейка */
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.empty {
+    background-color: var(--color-table-empty) !important;
+    color: #9ca3af !important;
+}
+
+/* Featured snippet */
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.featured-snippet {
+    background-color: var(--color-table-featured-snippet) !important;
+    color: #2B323B !important;
+    position: relative !important;
+}
+
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.featured-snippet::before {
+    content: "★" !important;
+    position: absolute !important;
+    top: -2px !important;
+    right: -2px !important;
+    font-size: 8px !important;
+    background: #fff !important;
+    color: var(--color-table-featured-snippet) !important;
+    border-radius: 50% !important;
+    width: 12px !important;
+    height: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Анимация при наведении */
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell:hover {
+    transform: scale(1.05) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    z-index: 10 !important;
+    position: relative !important;
+}
+
+/* Стили для индикатора изменений */
+.requests.requests-yandex .requests__table-body-item .change-indicator {
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    font-weight: 600 !important;
+}
+
+.requests.requests-yandex .requests__table-body-item .change-indicator.positive {
+    color: #26842A !important;
+    border-color: #26842A !important;
+}
+
+.requests.requests-yandex .requests__table-body-item .change-indicator.negative {
+    color: #FF6A55 !important;
+    border-color: #FF6A55 !important;
+}
+
+.requests.requests-yandex .requests__table-body-item .change-indicator.neutral {
+    color: #6b7280 !important;
+}
+
+.requests.requests-yandex .requests__table-body-item .change-indicator svg {
+    width: 12px !important;
+    height: 12px !important;
+}
+
+/* Топ позиции с высокой специфичностью */
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.top1 {
+    background-color: var(--color-table-top-1) !important;
+    color: #2B323B !important;
+    font-weight: 700 !important;
+}
+
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.top2 {
+    background-color: var(--color-table-top-2) !important;
+    color: #2B323B !important;
+    font-weight: 700 !important;
+}
+
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.top3 {
+    background-color: var(--color-table-top-3) !important;
+    color: #2B323B !important;
+    font-weight: 600 !important;
+}
+
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.top4,
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.top5 {
+    background-color: var(--color-table-top-4) !important;
+    color: #1a1d1f !important;
+    font-weight: 600 !important;
+}
+
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.top6,
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.top7 {
+    background-color: var(--color-table-top-6) !important;
+    color: #1a1d1f !important;
+    font-weight: 500 !important;
+}
+
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.top8,
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.top9 {
+    background-color: var(--color-table-top-8) !important;
+    color: #1a1d1f !important;
+    font-weight: 500 !important;
+}
+
+.requests.requests-yandex .requests__table .requests__table-positions .position-cell.top10 {
+    background-color: var(--color-table-top-10) !important;
+    color: #1a1d1f !important;
+    font-weight: 500 !important;
+}
+
+/* Мобильные устройства */
+@media (max-width: 768px) {
+    .requests.requests-yandex .requests__table .requests__table-positions .position-cell {
+        padding: 2px 4px !important;
+        margin: 1px !important;
+        min-width: 25px !important;
+        font-size: 12px !important;
+    }
+}

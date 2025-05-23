@@ -9,7 +9,11 @@ import { YandexVisibility } from "../widgets/YandexVisibility";
 import { KeywordsPositions } from "../widgets/KeywordsPostitions";
 import { HowToModal } from "../widgets/HowToModal";
 import { Layout } from "../../../shared/ui/layout";
-import {useEffectOnce} from "../../../core/hooks/useEffectOnce";
+import { useEffectOnce } from "../../../core/hooks/useEffectOnce";
+import {
+  getActiveServiceTypeFromStorage,
+  serviceHasMetricsData,
+} from "../../../core/lib/utils";
 
 export const StatisticsPage = () => {
   const {
@@ -19,6 +23,7 @@ export const StatisticsPage = () => {
     dateRange,
     positionsDateRange,
     setPositionsDateRange,
+    setKeywordsDateRange,
     setDateRange,
     graphType,
     setGraphType,
@@ -32,8 +37,13 @@ export const StatisticsPage = () => {
     keywordsLoading,
     positions,
     keywords,
+    selectedRegionKeywords,
+    selectedSearcherKeywords,
+    setSelectedSearcherKeywords,
+    setSelectedRegionKeywords,
     cities,
     groups,
+    keywordsDateRange,
     selectedConversion,
     setSelectedConversion,
     selectedCities,
@@ -58,28 +68,31 @@ export const StatisticsPage = () => {
     isProjectDataLoaded,
   } = useStatisticsStore();
 
+  const serviceType = getActiveServiceTypeFromStorage();
+
   const [howToModalOpen, setHowToModalOpen] = useState(false);
   const [selectedStats, setSelectedStats] = useState([
     "Топ 1-3",
     "Топ 1-10",
-    "Топ 1-30",
-    "Топ 1-50",
-    "Все запросы",
-    "WS10",
-    "PTraf",
+    "Топ 11-30",
+    "Топ 31-50",
+    "Топ 51-100",
+    "Топ 101+",
   ]);
 
   // Initialize data when component mounts
   useEffectOnce(() => {
     // First, fetch goals list
-    fetchGoalsList()
-    fetchProjectData()
+    fetchGoalsList();
+    fetchProjectData();
   }, []);
   useEffect(() => {
-    fetchVisits();
-    fetchRejections();
+    if (serviceHasMetricsData(serviceType)) {
+      fetchVisits(serviceType);
+      fetchRejections(serviceType);
+    }
     fetchGoals();
-  }, [period, dateRange]);
+  }, [period, dateRange, serviceType]);
 
   useEffect(() => {
     if (selectedConversion) {
@@ -92,14 +105,19 @@ export const StatisticsPage = () => {
     if (isProjectDataLoaded && selectedSearcher && selectedRegion) {
       fetchPositions();
     }
-  }, [selectedSearcher, selectedRegion, isProjectDataLoaded]);
+  }, [
+    selectedSearcher,
+    selectedRegion,
+    isProjectDataLoaded,
+    positionsDateRange,
+  ]);
 
   // Reload keywords when selected cities or groups change
   useEffect(() => {
-    if (isProjectDataLoaded) {
+    if (selectedSearcherKeywords && selectedRegionKeywords) {
       fetchKeywords();
     }
-  }, [selectedCities, selectedGroups]);
+  }, [selectedSearcherKeywords, selectedRegionKeywords, keywordsDateRange]);
 
   // Handle conversion change
   const handleConversionChange = (newConversion) => {
@@ -138,33 +156,38 @@ export const StatisticsPage = () => {
 
         {/* Add search engine and region selectors */}
 
-
-
         <YandexVisibility
-            positions={positions}
-            isLoading={positionsLoading}
-            selectedStats={selectedStats}
-            onStatsChange={setSelectedStats}
-            selectedSearcher={selectedSearcher}
-            selectedRegion={selectedRegion}
-            searchers={searchers}
-            regions={regions}
-            onSearcherChange={setSelectedSearcher}
-            onRegionChange={setSelectedRegion}
-            projectDataLoading={projectDataLoading}
-            dateRange={positionsDateRange} // Используем отдельный dateRange
-            onDateRangeChange={setPositionsDateRange} // И его метод обновления
-            fetchPositions={fetchPositions}
+          graphType={graphType}
+          positions={positions}
+          isLoading={positionsLoading}
+          selectedStats={selectedStats}
+          onStatsChange={setSelectedStats}
+          selectedSearcher={selectedSearcher}
+          selectedRegion={selectedRegion}
+          searchers={searchers}
+          regions={regions}
+          onSearcherChange={setSelectedSearcher}
+          onRegionChange={setSelectedRegion}
+          projectDataLoading={projectDataLoading}
+          dateRange={positionsDateRange} // Используем отдельный dateRange
+          onDateRangeChange={setPositionsDateRange} // И его метод обновления
+          fetchPositions={fetchPositions}
         />
 
         <KeywordsPositions
+          onSearcherChange={setSelectedSearcherKeywords}
+          onRegionChange={setSelectedRegionKeywords}
           keywords={keywords}
-          cities={cities}
-          groups={groups}
+          searchers={searchers}
+          regions={regions}
+          selectedSearcher={selectedSearcherKeywords}
+          selectedRegion={selectedRegionKeywords}
           selectedCities={selectedCities}
           selectedGroups={selectedGroups}
           onCitiesChange={setSelectedCities}
           onGroupsChange={setSelectedGroups}
+          onKeywordsDateRangeChange={setKeywordsDateRange}
+          keywordsDateRange={keywordsDateRange}
           isLoading={keywordsLoading}
         />
 

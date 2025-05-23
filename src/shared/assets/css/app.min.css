@@ -2797,13 +2797,19 @@ body.dark .apexcharts-canvas .apexcharts-xcrosshairs.apexcharts-active, body.dar
     padding: 0; }
 .apexcharts-canvas .apexcharts-tooltip-series-group {
     background: none !important;
-    padding: 0 !important; }
+    padding: 0 !important;
+    margin-bottom: 4px;
+}
+
 .apexcharts-canvas .apexcharts-tooltip-y-group {
     padding: 0; }
 .apexcharts-canvas .apexcharts-tooltip-marker {
     margin-right: 4px;
     border-radius: 4px; }
 .apexcharts-canvas .apexcharts-tooltip-text {
+    font-weight: 500;
+    color: #000; }
+body.dark .apexcharts-canvas .apexcharts-tooltip-text {
     font-weight: 600;
     color: #FCFCFC; }
 .apexcharts-canvas .apexcharts-tooltip.apexcharts-theme-light {

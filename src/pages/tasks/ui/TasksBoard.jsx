@@ -105,15 +105,15 @@ export const TasksBoard = ({ onTaskClick }) => {
 
   return (
     <>
-      <div className="shop__control">
-        <div className="shop__nav shop__nav-select">
-          <Select
-            options={months}
-            value={selectedMonth}
-            onChange={setSelectedMonth}
-          />
-        </div>
-      </div>
+      {/*<div className="shop__control">*/}
+      {/*  <div className="shop__nav shop__nav-select">*/}
+      {/*    <Select*/}
+      {/*      options={months}*/}
+      {/*      value={selectedMonth}*/}
+      {/*      onChange={setSelectedMonth}*/}
+      {/*    />*/}
+      {/*  </div>*/}
+      {/*</div>*/}
 
       <div className="shop__control">
         <div className="shop__nav shop__nav-links">

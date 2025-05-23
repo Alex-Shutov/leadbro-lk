@@ -40,6 +40,12 @@ export const useStatisticsStore = create((set, get) => ({
     start: getMonthAgoFormatted(),
     end: getCurrentDateFormatted(),
   },
+  keywordsDateRange: {
+    start: getMonthAgoFormatted(),
+    end: getCurrentDateFormatted(),
+  },
+  setKeywordsDateRange: (positionsDateRange) =>
+    set({ keywordsDateRange: positionsDateRange }),
   dateRange: {
     start: getWeekAgoFormatted(),
     end: getCurrentDateFormatted(),
@@ -62,7 +68,8 @@ export const useStatisticsStore = create((set, get) => ({
   selectedConversion: null, // Changed from "Показать все конверсии" to null
   availableGoals: [], // New property to store all available goals
   availableGoalsLoading: false,
-  setSelectedConversion: (conversion) => set({ selectedConversion: conversion }),
+  setSelectedConversion: (conversion) =>
+    set({ selectedConversion: conversion }),
 
   // Positions data
   positions: null,
@@ -82,12 +89,55 @@ export const useStatisticsStore = create((set, get) => ({
   projectId: null,
   selectedSearcher: null, // Will store the selected searcher object
   selectedRegion: null, // Will store the selected region object
+
+  selectedSearcherKeywords: null, // Will store the selected searcher object
+  selectedRegionKeywords: null, // Will store the selected region object
+  searchersKeywords: [],
+  regionsKeywords: [],
+
+  updateKeywordsDateRange: (dateRange) => {
+    const { fetchKeywords } = get();
+
+    // Update date range in state
+    set({ keywordsDateRange: dateRange });
+
+    // Fetch new data with updated date range
+    fetchKeywords();
+  },
+
+  setSelectedSearcherKeywords: (searcher) => {
+    // При изменении поисковика получаем соответствующие регионы
+    const regions = searcher?.regions || [];
+    // Выбираем первый регион из нового списка
+    const defaultRegion = regions.length > 0 ? regions[0] : null;
+
+    set({
+      selectedSearcherKeywords: searcher,
+      regionsKeywords: regions, // Обновляем список доступных регионов
+      selectedRegionKeywords: defaultRegion, // Устанавливаем первый регион по умолчанию
+    });
+
+    if (searcher && defaultRegion) {
+      const { fetchKeywords } = get();
+      fetchKeywords();
+    }
+  },
+
+  setSelectedRegionKeywords: (region) => {
+    set({ selectedRegionKeywords: region });
+
+    if (region) {
+      const { fetchKeywords } = get();
+      fetchKeywords();
+    }
+  },
+
   isProjectDataLoaded: false,
 
   setSearchers: (searchers) => set({ searchers }),
   setRegions: (regions) => set({ regions }),
   setSelectedSearcher: (searcher) => {
-    debugger
+    debugger;
     // При изменении поисковика получаем соответствующие регионы
     const regions = searcher?.regions || [];
     // Выбираем первый регион из нового списка
@@ -96,7 +146,7 @@ export const useStatisticsStore = create((set, get) => ({
     set({
       selectedSearcher: searcher,
       regions, // Обновляем список доступных регионов
-      selectedRegion: defaultRegion // Устанавливаем первый регион по умолчанию
+      selectedRegion: defaultRegion, // Устанавливаем первый регион по умолчанию
     });
 
     // После смены поисковика и региона загружаем новые данные позиций
@@ -106,7 +156,7 @@ export const useStatisticsStore = create((set, get) => ({
     }
   },
 
-// Метод для изменения выбранного региона
+  // Метод для изменения выбранного региона
   setSelectedRegion: (region) => {
     set({ selectedRegion: region });
 
@@ -121,14 +171,16 @@ export const useStatisticsStore = create((set, get) => ({
   fetchProjectData: async () => {
     try {
       set({ projectDataLoading: true });
-      const response = await statisticsApi.fetchProjectData()
+      const response = await statisticsApi.fetchProjectData();
 
       set({
         ...response,
         projectId: response.projectData.id,
         selectedSearcher: response.defaultSearcher,
+        selectedSearcherKeywords: response.defaultSearcher,
         selectedRegion: response.defaultRegion,
-        projectDataLoading: false
+        selectedRegionKeywords: response.defaultRegion,
+        projectDataLoading: false,
       });
 
       if (response.defaultSearcher && response.defaultRegion) {
@@ -137,7 +189,7 @@ export const useStatisticsStore = create((set, get) => ({
       }
 
       return {
-      ...response,
+        ...response,
       };
     } catch (error) {
       console.error("Error fetching project data:", error);
@@ -152,12 +204,15 @@ export const useStatisticsStore = create((set, get) => ({
     }
   },
 
-
-  fetchVisits: async () => {
+  fetchVisits: async (serviceType) => {
     const { period, dateRange } = get();
     set({ visitsLoading: true });
     try {
-      const response = await statisticsApi.fetchVisits(period, dateRange);
+      const response = await statisticsApi.fetchVisits(
+        period,
+        dateRange,
+        serviceType,
+      );
       set({ visits: response, visitsLoading: false });
     } catch (error) {
       console.error("Failed to fetch visits:", error);
@@ -165,11 +220,15 @@ export const useStatisticsStore = create((set, get) => ({
     }
   },
 
-  fetchRejections: async () => {
+  fetchRejections: async (serviceType) => {
     const { period, dateRange } = get();
     set({ rejectionsLoading: true });
     try {
-      const response = await statisticsApi.fetchRejections(period, dateRange);
+      const response = await statisticsApi.fetchRejections(
+        period,
+        dateRange,
+        serviceType,
+      );
       set({ rejections: response, rejectionsLoading: false });
     } catch (error) {
       console.error("Failed to fetch rejections:", error);
@@ -182,18 +241,18 @@ export const useStatisticsStore = create((set, get) => ({
     try {
       const { availableGoals } = get();
       if (availableGoals.length !== 0) {
-        return availableGoals
+        return availableGoals;
       }
       set({ availableGoalsLoading: true });
 
       const goalsList = await statisticsApi.fetchGoalsList();
       set({ availableGoals: goalsList });
-      debugger
+      debugger;
       // If we have goals but no selected conversion yet, select the first one
       if (goalsList.length > 0 && !get().selectedConversion) {
         set({ selectedConversion: goalsList[0].name });
       }
-      set({availableGoalsLoading: false});
+      set({ availableGoalsLoading: false });
       return goalsList;
     } catch (error) {
       console.error("Error fetching goals list:", error);
@@ -203,10 +262,18 @@ export const useStatisticsStore = create((set, get) => ({
 
   // Updated goals fetch function
   fetchGoals: async () => {
-    const { period, dateRange, selectedConversion, availableGoals,fetchGoalsList,availableGoalsLoading,goalsLoading } = get();
+    const {
+      period,
+      dateRange,
+      selectedConversion,
+      availableGoals,
+      fetchGoalsList,
+      availableGoalsLoading,
+      goalsLoading,
+    } = get();
     try {
       if (availableGoalsLoading) {
-        return
+        return;
       }
       // If we don't have goals yet, fetch them first
       if (availableGoals.length === 0) {
@@ -226,7 +293,9 @@ export const useStatisticsStore = create((set, get) => ({
       // If we have a selected conversion and goals, fetch data for that conversion
       if (currentConversion && goals.length > 0 && !goalsLoading) {
         // Find the goal object that matches the selected conversion name
-        const selectedGoal = goals.find(goal => goal.name === currentConversion);
+        const selectedGoal = goals.find(
+          (goal) => goal.name === currentConversion,
+        );
         set({ goalsLoading: true });
 
         if (selectedGoal) {
@@ -234,12 +303,12 @@ export const useStatisticsStore = create((set, get) => ({
           const response = await statisticsApi.fetchGoalData(period, {
             ...dateRange,
             goalId: selectedGoal.id,
-            goalName: selectedGoal.name
+            goalName: selectedGoal.name,
           });
 
           set({
             goals: response,
-            goalsLoading: false
+            goalsLoading: false,
           });
         } else {
           // If we couldn't find the selected goal, set a default empty state
@@ -251,10 +320,10 @@ export const useStatisticsStore = create((set, get) => ({
                 comparedTo: dateRange.start,
                 series: [{ name: currentConversion || "Нет данных", data: [] }],
                 categories: [],
-                conversions: goals.map(g => g.name)
-              }
+                conversions: goals.map((g) => g.name),
+              },
             },
-            goalsLoading: false
+            goalsLoading: false,
           });
         }
       } else {
@@ -273,14 +342,19 @@ export const useStatisticsStore = create((set, get) => ({
         //   goalsLoading: false
         // });
       }
-
     } catch (error) {
       console.error("Failed to fetch goals:", error);
     }
   },
 
   fetchPositions: async () => {
-    const { period, positionsDateRange, selectedSearcher, selectedRegion, projectId } = get();
+    const {
+      period,
+      positionsDateRange,
+      selectedSearcher,
+      selectedRegion,
+      projectId,
+    } = get();
 
     // Проверяем наличие необходимых данных
     if (!selectedSearcher || !selectedRegion || !projectId) {
@@ -291,10 +365,10 @@ export const useStatisticsStore = create((set, get) => ({
             series: [],
             categories: [],
             stats: [],
-            topDynamics: {}
-          }
+            topDynamics: {},
+          },
         },
-        positionsLoading: false
+        positionsLoading: false,
       });
       return null;
     }
@@ -303,15 +377,15 @@ export const useStatisticsStore = create((set, get) => ({
     try {
       // Получаем searcherKey и regionKey для API
       const searcherKey = selectedSearcher.key;
-      const regionKey = selectedRegion.key;
+      const regionKey = selectedRegion.index;
 
       // Вызываем API с необходимыми параметрами
       const response = await statisticsApi.fetchPositions(
-          period,
-          positionsDateRange,
-          searcherKey,
-          regionKey,
-          projectId  // Используем ID проекта или значение по умолчанию
+        period,
+        positionsDateRange,
+        searcherKey,
+        regionKey,
+        projectId, // Используем ID проекта или значение по умолчанию
       );
 
       // Проверяем наличие данных в ответе
@@ -322,7 +396,7 @@ export const useStatisticsStore = create((set, get) => ({
       // Устанавливаем данные в store
       set({
         positions: { data: response.data },
-        positionsLoading: false
+        positionsLoading: false,
       });
 
       return response.data;
@@ -336,10 +410,10 @@ export const useStatisticsStore = create((set, get) => ({
             series: [],
             categories: [],
             stats: [],
-            topDynamics: {}
-          }
+            topDynamics: {},
+          },
         },
-        positionsLoading: false
+        positionsLoading: false,
       });
 
       return null;
@@ -347,23 +421,54 @@ export const useStatisticsStore = create((set, get) => ({
   },
 
   fetchKeywords: async () => {
-    const { period, dateRange, selectedCities, selectedGroups } = get();
+    const {
+      keywordsDateRange,
+      selectedSearcherKeywords,
+      selectedRegionKeywords,
+      projectId,
+    } = get();
+    debugger;
     set({ keywordsLoading: true });
+
     try {
-      const response = await statisticsApi.fetchKeywords(period, {
-        ...dateRange,
-        cities: selectedCities,
-        groups: selectedGroups,
-      });
+      if (!selectedSearcherKeywords || !selectedRegionKeywords) {
+        throw new Error("Search engine or region not selected");
+      }
+
+      // Prepare parameters for the API call
+      const params = {
+        from: keywordsDateRange.start,
+        to: keywordsDateRange.end,
+        projectId: projectId,
+        searcherKey: selectedSearcherKeywords.key,
+        regionKey: selectedRegionKeywords.key,
+        regionIndex: selectedRegionKeywords.index || selectedRegionKeywords.key, // Some APIs use index instead of key
+      };
+
+      // Call the API to fetch keyword positions
+      const response = await statisticsApi.fetchKeywordPositions(params);
+
+      // Update state with the response data
       set({
-        keywords: response.data.keywords,
-        cities: response.data.cities,
-        groups: response.data.groups,
+        keywords: response.keywords,
+        cities: response.cities || [],
+        groups: response.groups || [],
         keywordsLoading: false,
       });
+
+      return response;
     } catch (error) {
-      console.error("Failed to fetch keywords:", error);
-      set({ keywordsLoading: false });
+      console.error("Failed to fetch keywords positions:", error);
+
+      // Set empty data on error
+      set({
+        keywords: [],
+        cities: [],
+        groups: [],
+        keywordsLoading: false,
+      });
+
+      return null;
     }
   },
 

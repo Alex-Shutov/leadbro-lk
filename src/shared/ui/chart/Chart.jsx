@@ -1,4 +1,3 @@
-// src/shared/ui/chart/Chart.jsx
 import React, { useEffect, useRef } from "react";
 import ApexCharts from "apexcharts";
 import "react-loading-skeleton/dist/skeleton.css";
@@ -14,7 +13,8 @@ export const Chart = ({
                         colors = ["#2A85FF", "#B5E4CA", "#B1E5FC", "#83BF6E", "#FF6A55", "#8E59FF"],
                         isLoading = false,
                         skeletonOpacity = 0.5,
-                        topDynamics = {} // Новый параметр для динамики топов
+                        topDynamics = {},
+                        options = {} // Принимаем кастомные options от родительского компонента
                       }) => {
   const chartRef = useRef(null);
   const containerRef = useRef(null);
@@ -103,7 +103,7 @@ export const Chart = ({
 
           // Создаем HTML для tooltip
           return `
-            <div class="apexcharts-tooltip-title" style="padding: 8px 10px; font-weight: bold; margin-bottom: 5px; background-color: #f8f9fa;">
+            <div class="apexcharts-tooltip-title" style="padding: 8px 10px; font-weight: bold; margin-bottom: 5px;">
               ${category}
             </div>
             <div class="apexcharts-tooltip-series-group" style="padding: 8px 10px; display: flex; flex-direction: column;">
@@ -121,7 +121,8 @@ export const Chart = ({
         }
       };
 
-      const options = {
+      // Определяем базовые опции графика
+      const defaultOptions = {
         grid: {
           strokeDashArray: 0,
           padding: {
@@ -131,26 +132,7 @@ export const Chart = ({
             left: 10,
           },
         },
-        legend: {
-          show: false,
-          position: 'top',
-          horizontalAlign: 'left',
-          offsetY: 0,
-          offsetX: 0,
-          fontSize: '12px',
-          fontFamily: 'Inter, sans-serif',
-          markers: {
-            width: 12,
-            height: 12,
-            radius: 12
-          },
-          onItemClick: {
-            toggleDataSeries: true
-          },
-          onItemHover: {
-            highlightDataSeries: true
-          }
-        },
+
         colors,
         series: sortedSeries,
         chart: {
@@ -231,12 +213,38 @@ export const Chart = ({
         ],
       };
 
+      // Объединяем базовые опции с кастомными опциями
+      const mergedOptions = {
+        ...defaultOptions,
+        ...options,
+        // Обеспечиваем сохранение базовых параметров, которые перезатираются в опциях верхнего уровня
+        chart: {
+          ...defaultOptions.chart,
+          ...options.chart,
+          type, // Гарантируем, что тип графика соответствует параметру type
+        },
+        // Гарантируем, что series и colors всегда применяются из параметров компонента
+        series: sortedSeries,
+        colors: colors,
+        xaxis: {
+          ...defaultOptions.xaxis,
+          ...options.xaxis,
+          categories: sortedCategories, // Гарантируем использование отсортированных категорий
+        },
+        // Убедимся, что легенда всегда видима, если не указано явно
+        legend: {
+          ...defaultOptions.legend,
+          ...options.legend,
+          show: false
+        }
+      };
+
       if (chartRef.current) {
-        chartRef.current.updateOptions(options);
+        chartRef.current.updateOptions(mergedOptions);
       } else {
         const chartElement = document.querySelector(`#${id}`);
         if (chartElement) {
-          chartRef.current = new ApexCharts(chartElement, options);
+          chartRef.current = new ApexCharts(chartElement, mergedOptions);
           chartRef.current.render();
         }
       }
@@ -248,7 +256,7 @@ export const Chart = ({
         chartRef.current = null;
       }
     };
-  }, [id, type, series, categories, height, colors, isLoading, topDynamics]);
+  }, [id, type, series, categories, height, colors, isLoading, topDynamics, options]);
 
   return (
       <div

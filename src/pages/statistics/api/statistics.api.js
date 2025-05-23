@@ -4,19 +4,32 @@ import apiClient, {
   yandexMetricaClient,
 } from "../../../shared/api/client";
 import {
-  mapGoalsData, mapPositionsData,
+  mapGoalsData,
+  mapKeywordsData,
+  mapPositionsData,
   mapRejectionsData,
-  mapTopVisorPositionsData, mapTopVisorProjectData,
+  mapSummaryChartData,
+  mapTopVisorPositionsData,
+  mapTopVisorProjectData,
   mapVisitsData,
 } from "../lib/statistics.mapper";
 import { formatDateForYandex } from "../lib/utils";
+import { getActiveServiceTypeFromStorage } from "../../../core/lib/utils";
 
 const COUNTER_ID = process.env.REACT_APP_YANDEX_METRICA_COUNTER_ID;
 
 export const statisticsApi = {
-  fetchVisits: async (period, dateRange) => {
+  fetchVisits: async (period, dateRange, serviceType) => {
     try {
       // Format dates for Yandex Metrica
+      let trafficFilter = "";
+      if (serviceType === "target") {
+        // Для SEO - только органический трафик из поисковых систем
+        trafficFilter = "ym:s:trafficSource=='organic'";
+      } else if (serviceType === "context") {
+        // Для контекстной рекламы - только трафик из рекламных систем
+        trafficFilter = "ym:s:trafficSource=='ad'";
+      }
       const startDate = formatDateForYandex(dateRange.start);
       const endDate = formatDateForYandex(dateRange.end);
 
@@ -36,7 +49,7 @@ export const statisticsApi = {
         group:
           period === "months" ? "month" : period === "weeks" ? "week" : "day",
         compare_periods: "1",
-        // filters: "ym:s:trafficSource=='organic'",
+        filters: trafficFilter,
       });
 
       return {
@@ -53,12 +66,19 @@ export const statisticsApi = {
     }
   },
 
-  fetchRejections: async (period, dateRange) => {
+  fetchRejections: async (period, dateRange, serviceType) => {
     try {
       // Format dates for Yandex Metrica
       const startDate = formatDateForYandex(dateRange.start);
       const endDate = formatDateForYandex(dateRange.end);
-
+      let trafficFilter = "";
+      if (serviceType === "target") {
+        // Для SEO - только органический трафик из поисковых систем
+        trafficFilter = "ym:s:trafficSource=='organic'";
+      } else if (serviceType === "context") {
+        // Для контекстной рекламы - только трафик из рекламных систем
+        trafficFilter = "ym:s:trafficSource=='ad'";
+      }
       // For development/testing, use mock data
       // if (process.env.REACT_APP_USE_MOCKS === "true") {
       //   console.log("Using mock data for rejections");
@@ -75,8 +95,7 @@ export const statisticsApi = {
         group:
           period === "months" ? "month" : period === "weeks" ? "week" : "day",
         compare_periods: "1",
-        // Используем только поисковый трафик для расчета отказов
-        // filters: "ym:s:trafficSource=='organic'",
+        filters: trafficFilter,
       });
 
       // Map the data before returning
@@ -96,7 +115,7 @@ export const statisticsApi = {
   fetchGoalsList: async () => {
     try {
       const response = await apiClient2.get(
-          `/api/cabinet/yandex/counter-goals`
+        `/api/cabinet/yandex/counter-goals`,
       );
       return response.data.goals || [];
     } catch (error) {
@@ -124,7 +143,7 @@ export const statisticsApi = {
         date1: startDate || "7daysAgo",
         date2: endDate || "today",
         group:
-            period === "months" ? "month" : period === "weeks" ? "week" : "day",
+          period === "months" ? "month" : period === "weeks" ? "week" : "day",
       };
 
       // Execute API request
@@ -134,16 +153,16 @@ export const statisticsApi = {
 
       // Get all goals to include in the mapped data
       const goalsResponse = await apiClient2.get(
-          `/api/cabinet/yandex/counter-goals`
+        `/api/cabinet/yandex/counter-goals`,
       );
       const goalsList = goalsResponse.data.goals || [];
 
       // Map the data to the expected format
       const mappedData = mapGoalsData(
-          response.data,
-          { goals: goalsList },
-          { start, end },
-          goalName
+        response.data,
+        { goals: goalsList },
+        { start, end },
+        goalName,
       );
 
       return {
@@ -184,13 +203,13 @@ export const statisticsApi = {
           start,
           end,
           goalId: firstGoal.id,
-          goalName: firstGoal.name
+          goalName: firstGoal.name,
         });
       }
 
       // If a specific conversion was requested, find it in the goals list
       const goalsList = await statisticsApi.fetchGoalsList();
-      const selectedGoal = goalsList.find(goal => goal.name === conversion);
+      const selectedGoal = goalsList.find((goal) => goal.name === conversion);
 
       if (selectedGoal) {
         // Fetch data for the selected goal
@@ -198,7 +217,7 @@ export const statisticsApi = {
           start,
           end,
           goalId: selectedGoal.id,
-          goalName: selectedGoal.name
+          goalName: selectedGoal.name,
         });
       } else {
         // If the goal wasn't found, return empty data
@@ -209,7 +228,7 @@ export const statisticsApi = {
             comparedTo: start,
             series: [{ name: conversion || "Конверсии", data: [] }],
             categories: [],
-            conversions: goalsList.map(goal => goal.name),
+            conversions: goalsList.map((goal) => goal.name),
           },
         };
       }
@@ -236,7 +255,7 @@ export const statisticsApi = {
       show_searchers_and_regions: "1",
       include_positions_summary: true,
     });
-    debugger
+    debugger;
     const projectData = response.data;
     const searchers = projectData?.searchers || [];
 
@@ -254,9 +273,15 @@ export const statisticsApi = {
     };
   },
 
-  fetchPositions: async (period, dateRange, searcherKey = null, regionKey = null, projectId = null) => {
+  fetchPositions: async (
+    period,
+    dateRange,
+    searcherKey = null,
+    regionKey = null,
+    projectId = null,
+  ) => {
     try {
-      // Проверяем наличие ключей поисковика и региона
+      // Check for required parameters
       if (searcherKey === null || regionKey === null) {
         console.warn("SearcherKey or regionKey not provided to fetchPositions");
         return {
@@ -264,41 +289,67 @@ export const statisticsApi = {
             series: [],
             categories: [],
             stats: [],
-            topDynamics: {}
-          }
+            topDynamics: {},
+            visibility: [],
+          },
         };
       }
 
-      // Получаем ID проекта
-      const finalProjectId = projectId || process.env.REACT_APP_TOPVISOR_PROJECT_ID || "7292013";
-      debugger
-      // Используем API форматированные даты если они есть, иначе используем дефолтные
-      const fromDate = dateRange.apiStart || formatDateForYandex(dateRange.start);
-      const toDate = dateRange.apiEnd || formatDateForYandex(dateRange.end);
+      // Get project ID
+      const finalProjectId =
+        projectId || process.env.REACT_APP_TOPVISOR_PROJECT_ID || "7292013";
 
-      console.log(`Fetching positions for searcher: ${searcherKey}, region: ${regionKey}, from: ${fromDate}, to: ${toDate}`);
+      // Format dates for API - convert from DD.MM.YYYY to YYYY-MM-DD
+      let fromDate, toDate;
 
-      // Получаем данные о позициях
-      const positionsResponse = await apiClient2.post(`/api/cabinet/topvisor/summary`, {
-        project_id: finalProjectId,
-        search_engines: [searcherKey],
-        regions: [regionKey],
-        region_index: regionKey.toString(), // Добавляем region_index как строку
-        from: fromDate, // Используем правильный формат для 'from'
-        to: toDate,    // Используем правильный формат для 'to'
-        show_tops: true,
-        show_visibility: true
-      });
+      if (dateRange.start && dateRange.start.includes(".")) {
+        const parts = dateRange.start.split(".");
+        if (parts.length === 3) {
+          fromDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+      } else {
+        fromDate = dateRange.apiStart || "2025-03-01";
+      }
 
-      // Используем маппер для преобразования данных
-      const mappedData = mapPositionsData(positionsResponse.data);
+      if (dateRange.end && dateRange.end.includes(".")) {
+        const parts = dateRange.end.split(".");
+        if (parts.length === 3) {
+          toDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+      } else {
+        toDate = dateRange.apiEnd || "2025-03-30";
+      }
+
+      console.log(
+        `Fetching positions for searcher: ${searcherKey}, region: ${regionKey}, from: ${fromDate}, to: ${toDate}`,
+      );
+
+      // Call the new API endpoint
+      const positionsResponse = await apiClient2.post(
+        `/api/cabinet/topvisor/summary-chart`,
+        {
+          project_id: finalProjectId,
+          type_range: 1,
+          region_index: regionKey.toString(),
+          from: fromDate,
+          to: toDate,
+          show_tops: 1,
+          show_visibility: 1,
+        },
+      );
+
+      // Use the new mapper
+      const mappedData = mapSummaryChartData(
+        positionsResponse.data,
+        finalProjectId,
+      );
 
       return {
-        data: mappedData
+        data: mappedData,
       };
     } catch (error) {
       console.error("Error fetching positions data:", error);
-      // Возвращаем пустую структуру данных в случае ошибки
+      // Return empty structure in case of error
       return {
         data: {
           series: [],
@@ -312,16 +363,65 @@ export const statisticsApi = {
             { title: "Топ 101+", count: 0, percentage: 0, color: "red" },
             { title: "Все запросы", count: 0, percentage: 0, color: "default" },
           ],
-          topDynamics: {}
+          topDynamics: {},
+          visibility: [],
         },
       };
     }
   },
 
+  fetchKeywordPositions: async (params) => {
+    try {
+      // Convert dates to required format
+      const fromDate =
+        formatDateForYandex(params.from) ||
+        params.apiFrom ||
+        new Date().toISOString().slice(0, 10);
+      const toDate =
+        formatDateForYandex(params.to) ||
+        params.apiTo ||
+        new Date().toISOString().slice(0, 10);
 
-  fetchKeywords: (period, filters = {}) => {
-    return apiClient.get("/statistics/keywords", {
-      params: { period, ...filters },
-    });
+      // Build request body
+      const requestBody = {
+        regions_indexes: [params.regionIndex || 84], // Default to region index 84 if not provided
+        from: fromDate,
+        to: toDate,
+        type_range: params.typeRange || "0", // Default type_range
+        show_headers: true,
+        positions_fields: ["position"],
+        fields: [
+          `volume:${params.regionKey || 54}:${params.searcherKey || 0}:1`,
+        ],
+      };
+
+      // // Add filtering by cities if provided
+      // if (params.selectedCities && params.selectedCities.length > 0) {
+      //   // Note: This is a placeholder - you'd need to adjust based on how filtering is actually implemented
+      //   requestBody.filter_cities = params.selectedCities;
+      // }
+
+      // // Add filtering by groups if provided
+      // if (params.selectedGroups && params.selectedGroups.length > 0) {
+      //   // Note: This is a placeholder - you'd need to adjust based on how filtering is actually implemented
+      //   requestBody.filter_groups = params.selectedGroups;
+      // }
+
+      // Make the API call
+      const response = await apiClient2.post(
+        "/api/cabinet/topvisor/history",
+        requestBody,
+      );
+
+      // Map the response data
+      return mapKeywordsData(response.data);
+    } catch (error) {
+      console.error("Error fetching keyword positions:", error);
+      return {
+        keywords: [],
+        cities: [],
+        groups: [],
+      };
+    }
   },
 };

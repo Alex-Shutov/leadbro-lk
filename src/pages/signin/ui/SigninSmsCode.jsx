@@ -47,7 +47,7 @@ export const SigninSmsForm = () => {
       const code = smsCode.join("");
       const success = await verifyCode(code);
       if (success) {
-        navigate("/");
+        navigate("/statistics");
       }
     }
   };
