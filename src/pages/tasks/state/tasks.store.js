@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { tasksApi } from "../api/tasks.api";
 import {
-  categoryMapping,
   createColumnsFromGroupedTasks,
   groupTasksByStatus,
   mapTaskFromApi,
@@ -167,6 +166,19 @@ export const useTasksStore = create(
     setSelectedMonth: (month) => {
       set({ selectedMonth: month });
       // get().fetchTasks();
+    },
+
+    fetchTaskComments: async (taskId) => {
+      set({ isLoading: true, error: null });
+      try {
+        const response = await tasksApi.getComments(taskId);
+        return response.data;
+      } catch (error) {
+        set({ error: error.message });
+        return [];
+      } finally {
+        set({ isLoading: false });
+      }
     },
 
     // Добавить комментарий к задаче

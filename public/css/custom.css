@@ -1850,7 +1850,7 @@ header:after, .container:after, footer:after, .widget-posts-list li:after, #subs
 
 .tasks-modal__left p {
     color: #1A1D1F;
-    font-weight: 600;
+    font-weight: 500;
     font-family: Inter, sans-serif;
     font-size: 15px;
     margin-top: 6px;

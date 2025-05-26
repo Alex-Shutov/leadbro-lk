@@ -3578,7 +3578,9 @@ body.dark .sidebar__item[href].active .icon, body.dark .sidebar__help.active .ic
 }
 
 .seo-mobile.active {
-    background-color: #f0f0f0;
+    border-radius:12px;
+    background: #272B30;
+    box-shadow: inset 0px -2px 1px rgba(0, 0, 0, 0.4), inset 0px 1px 1px rgba(255, 255, 255, 0.11);
 }
 body.dark .sidebar__item[href].active, body.dark .sidebar__help.active {
     background: #272B30;

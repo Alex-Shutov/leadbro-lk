@@ -1,4 +1,5 @@
 import axios from "axios";
+import { handleError } from "../../core/lib/snackbar";
 
 const API_URL = process.env.REACT_APP_API_URL;
 const API_URL_2 = process.env.REACT_APP_API_URL_2;
@@ -78,11 +79,13 @@ setupBaseInterceptors(topvisorClient);
 setupBaseInterceptors(yandexMetricaClient);
 
 const handleSuccessResponse = (response) => {
+  debugger;
   return { status: "success", data: response.data };
 };
 
 // Обработка ошибок
 const handleErrorResponse = (error) => {
+  debugger;
   const errorResponse = {
     status: "error",
     message: error.message,
@@ -121,6 +124,7 @@ const handleErrorResponse = (error) => {
     // Здесь можно добавить логику отображения ошибок (например, через toast)
     errorMessages.forEach((msg) => {
       console.error("Error:", msg); // Замените на ваш механизм показа ошибок
+      handleError(msg);
     });
   };
 

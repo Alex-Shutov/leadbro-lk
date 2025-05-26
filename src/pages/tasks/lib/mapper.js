@@ -138,3 +138,14 @@ export const createColumnsFromGroupedTasks = (groupedTasks) => {
     tasks: groupedTasks[status] || [],
   }));
 };
+
+export const mapComments = (commentsData) => {
+  return commentsData.map((comment) => ({
+    id: comment.id,
+    author:
+      `${comment.commentator.name} ${comment.commentator.middle_name || ""}`.trim(),
+    text: comment.text,
+    date: new Date(comment.created_at).toLocaleDateString(),
+    // Можно добавить другие поля если нужно
+  }));
+};

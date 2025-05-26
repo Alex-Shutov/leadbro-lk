@@ -7,6 +7,7 @@ export const tasksApi = {
    * @param {string} month - Месяц для фильтрации (необязательный параметр)
    * @returns {Promise<Array>} Массив задач
    */
+
   getTasks: async (category, month = null) => {
     try {
       let url = `/tasks?category=${category}`;
@@ -22,6 +23,19 @@ export const tasksApi = {
       throw error;
     }
   },
+
+  getComments: async (taskId) => {
+    try {
+      const response = await apiClient2.get(
+        `/api/cabinet/tasks/${taskId}/comments`,
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+      throw error;
+    }
+  },
+
   /**
    * Получить детали задачи по ID
    * @param {number} taskId - ID задачи
@@ -45,9 +59,12 @@ export const tasksApi = {
    */
   addComment: async (taskId, comment) => {
     try {
-      const response = await apiClient2.post(`/tasks/${taskId}/activities`, {
-        text: comment,
-      });
+      const response = await apiClient2.post(
+        `/api/cabinet/tasks/${taskId}/comments`,
+        {
+          text: comment,
+        },
+      );
       return response.data;
     } catch (error) {
       console.error("Error adding comment:", error);

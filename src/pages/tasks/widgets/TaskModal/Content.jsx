@@ -1,9 +1,10 @@
 import React from "react";
+import EditorRenderer from "../../../../shared/ui/editor/EditorRenderer";
 
 export const TaskModalContent = ({ description, tasks, additionalInfo }) => {
   return (
     <>
-      <p>{description}</p>
+      <EditorRenderer content={description} />
 
       {/*{tasks && tasks.length > 0 && (*/}
       {/*  <div className="tasks-modal__tasks">*/}

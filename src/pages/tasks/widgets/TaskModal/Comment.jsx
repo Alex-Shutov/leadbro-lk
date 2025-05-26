@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import EditorRenderer from "../../../../shared/ui/editor/EditorRenderer";
 
 export const TaskModalComments = ({
   comments = [],
@@ -14,6 +15,7 @@ export const TaskModalComments = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    debugger;
 
     if (!comment.trim()) return;
 
@@ -41,16 +43,7 @@ export const TaskModalComments = ({
       {comments.length > 0 && (
         <div className="task-modal__comments">
           {comments.map((commentItem, index) => (
-            <div
-              key={index}
-              className="task-modal__comment"
-              style={{
-                marginBottom: "15px",
-                padding: "10px",
-                background: "#f4f4f4",
-                borderRadius: "8px",
-              }}
-            >
+            <div key={index} className="task-modal__comment" style={{}}>
               <div
                 style={{
                   display: "flex",
@@ -63,7 +56,7 @@ export const TaskModalComments = ({
                   {commentItem.date}
                 </span>
               </div>
-              <p>{commentItem.text}</p>
+              <EditorRenderer className={"editor"} content={commentItem.text} />
             </div>
           ))}
         </div>

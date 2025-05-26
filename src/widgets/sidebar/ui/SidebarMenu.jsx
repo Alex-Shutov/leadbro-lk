@@ -104,6 +104,7 @@ export const SidebarMenu = ({ isExpanded }) => {
         return (
           <React.Fragment key={service.id || index}>
             <SidebarDropdown
+              iconConfig={iconConfig}
               title={service.name}
               icon={icon}
               items={pages}
@@ -116,7 +117,7 @@ export const SidebarMenu = ({ isExpanded }) => {
             />
 
             <Link
-              className={`sidebar__item ${index === 0 ? "seo-pc" : ""} ${isActive ? "active" : ""}`}
+              className={`sidebar__item seo-pc ${isActive ? "active" : ""}`}
               style={{ marginTop: index === 0 ? "25px" : "0" }}
               to={pages.length > 0 ? pages[0].to : "#"}
               onClick={() => handleServiceClick(service)}

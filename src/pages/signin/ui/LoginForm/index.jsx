@@ -15,7 +15,7 @@ const LoginForm = () => {
   const handleSubmit = (event) => {
     event?.preventDefault();
     login(email, password).then((res) => {
-      navigate("/statistics");
+      res && navigate("/statistics");
     });
   };
 

@@ -78,7 +78,37 @@ header:after, .container:after, footer:after, .widget-posts-list li:after, #subs
     align-items: center;
     gap: 8px;
 }
+.task-modal__comment{
+    margin-bottom: 15px;
+    padding: 10px;
+    background: #f4f4f4;
+    border-radius: 8px;
+}
+body.dark  .task-modal__comment{
+    background: #33383F;
+}
 
+.task-modal__comments .editor .jodit-workplace{
+    background-color: rgb(244, 244, 244) !important;
+}
+
+body.dark .task-modal__comments .editor .jodit-workplace{
+    background-color: #33383F !important;
+}
+body.dark .tasks-modal__left .task-modal__comment .jodit-workplace p {
+    color: #FCFCFC;
+}
+
+.task-modal__comments{
+    max-height: 300px;
+    overflow-y: auto;
+}
+body.dark{
+    .jodit-workplace {
+        background-color: #1A1D1F !important;
+
+    }
+}
 .calendar__details {
     display: flex;
     flex-direction: column;
@@ -659,6 +689,8 @@ body.dark .sidebar__action .button-stroke{
 
     .seo-mobile{
         display: block;
+    }
+    .seo-mobile.active{
     }
 
     .seo-pc{
@@ -2202,7 +2234,7 @@ body.dark .requests__table-title .title {
 
 .tasks-modal__left p {
     color: #1A1D1F;
-    font-weight: 600;
+    font-weight: 500;
     font-family: Inter, sans-serif;
     font-size: 15px;
     margin-top: 6px;

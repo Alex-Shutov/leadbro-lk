@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import cn from "classnames";
 import { Dropdown } from "../../../shared/ui/dropdown/Dropdown";
+import { Icon } from "../../../shared/ui/icon";
 
 export const SidebarDropdown = ({
   title,
   icon,
   items,
   isExpanded = false,
+  iconConfig = {},
   isMobile = false,
   isActive = false,
   className = "",
@@ -36,10 +38,23 @@ export const SidebarDropdown = ({
       contentClassName="sidebar__body"
       style={style}
       trigger={
-        <div className="sidebar__head" onClick={handleHeaderClick}>
-          <svg className={`icon icon-${icon}`}>
-            <use xlinkHref={`#icon-${icon}`}></use>
-          </svg>
+        // <div className="sidebar__head" onClick={handleHeaderClick}>
+        //   <svg className={`icon icon-${icon}`}>
+        //     <use xlinkHref={`#icon-${icon}`}></use>
+        //   </svg>
+        //   {title}
+        //   <svg className="icon icon-arrow-down">
+        //     <use xlinkHref="#icon-arrow-down"></use>
+        //   </svg>
+        // </div>
+        <div onClick={handleHeaderClick} className={"sidebar__head"}>
+          <Icon
+            className={"icon"}
+            name={icon}
+            viewBox={"0 0 24 24"}
+            size={24}
+            {...iconConfig}
+          />
           {title}
           <svg className="icon icon-arrow-down">
             <use xlinkHref="#icon-arrow-down"></use>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   TaskModalComments,
   TaskModalContent,
@@ -7,23 +7,39 @@ import {
 } from "../widgets/TaskModal";
 import { useTasksStore } from "../state/tasks.store";
 import { Modal } from "../../../shared/ui/modal";
+import { mapComments } from "../lib/mapper";
 
 export const TaskModal = ({ isOpen, onClose, task }) => {
   const [comment, setComment] = useState("");
-  const { addComment, isLoading } = useTasksStore();
+  const [comments, setComments] = useState([]);
+  const { addComment, isLoading, fetchTaskComments } = useTasksStore();
+
+  useEffect(() => {
+    if (isOpen && task) {
+      const loadComments = async () => {
+        const commentsData = await fetchTaskComments(task.id);
+        debugger;
+        setComments(mapComments(commentsData));
+      };
+      loadComments();
+    }
+  }, [isOpen, task]);
+
+  if (!task) {
+    return null;
+  }
 
   // Если задача не загружена, не отображаем модальное окно
   if (!task) {
     return null;
   }
 
-  const handleSubmitComment = async (e) => {
-    e.preventDefault();
-    if (!comment.trim()) return;
-
-    const success = await addComment(task.id, comment);
+  const handleSubmitComment = async (taskId, comment) => {
+    const success = await addComment(taskId, comment);
     if (success) {
       setComment("");
+      const commentsData = await fetchTaskComments(taskId);
+      setComments(mapComments(commentsData));
     }
   };
 
@@ -41,7 +57,7 @@ export const TaskModal = ({ isOpen, onClose, task }) => {
             />
 
             <TaskModalComments
-              comments={task.comments}
+              comments={comments}
               addComment={handleSubmitComment}
               taskId={task.id}
               isLoading={isLoading}
